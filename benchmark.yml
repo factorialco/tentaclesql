@@ -1,0 +1,23 @@
+# Execute this test plan with drill and this command parameters:
+#
+# COOKIE='30d8a898120aa83203bea21b89b16ba0' drill --stats --benchmark benchmark.yml
+#
+# Tune your cookie value first
+---
+concurrency: 5
+base: 'http://localhost:8080'
+iterations: 10
+
+plan:
+  - name: POST query
+    request:
+      url: /sql
+      method: POST
+      body: '{ "query": "{{ item }}" }'
+      headers:
+        Content-Type: 'application/json'
+        Cookie: '_factorial_session_v2={{ COOKIE }}'
+    with_items:
+      - "SELECT 1+1"
+      - "SELECT * FROM employee"
+      - "SELECT goal_config_id, name FROM goals_config WHERE goal_config_id > (SELECT COUNT(*) - 100 FROM employee) AND 1=1"

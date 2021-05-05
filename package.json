@@ -1,0 +1,48 @@
+{
+  "name": "data-engine-lite",
+  "version": "1.0.0",
+  "description": "Factorial SQL engine",
+  "dependencies": {
+    "better-sqlite3": "^7.1.5",
+    "fastify": "^3.14.2",
+    "node-fetch": "^2.6.1",
+    "pino": "^6.11.3",
+    "sqlite-parser": "^1.0.1",
+    "yargs": "^16.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.13.16",
+    "@babel/preset-env": "^7.13.15",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/better-sqlite3": "^5.4.1",
+    "@types/jest": "^26.0.23",
+    "@types/node": "^14.14.41",
+    "@types/node-fetch": "^2.5.10",
+    "@types/yargs": "^16.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "eslint": "^7.25.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "esno": "^0.5.0",
+    "jest": "^26.6.3",
+    "pino-pretty": "^4.7.1",
+    "rimraf": "^3.0.2",
+    "tsup": "^4.9.1",
+    "typescript": "^4.2.4"
+  },
+  "scripts": {
+      "build": "rimraf dist && tsup src/queryTables.ts --format cjs,esm --dts",
+      "cli": "LOG_LEVEL='debug' esno cli.ts",
+      "lint": "eslint . --ext .ts",
+      "start": "esno server.ts",
+      "test": "jest",
+      "test:watch": "jest --watch",
+      "watch": "yarn build -- --watch"
+  },
+  "author": "",
+  "license": "ISC"
+}
