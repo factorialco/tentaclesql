@@ -10,7 +10,7 @@ interface Body {
 }
 
 // SQL Query endpoint
-server.post<{ Body: Body }>('/sql', (request, reply) => {
+server.post<{ Body: Body }>('/', (request, reply) => {
   return queryTables(
     request.body.query,
     request.body.parameters || [],

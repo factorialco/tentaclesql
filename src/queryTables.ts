@@ -31,8 +31,8 @@ function getConfig (): Config {
   const apiUrl = process.env.API_DOMAIN || ''
 
   return {
-    schemaUrl: `${apiUrl}/reports/sql/schema`,
-    tableUrl: `${apiUrl}/reports/sql/tables/`,
+    schemaUrl: `${apiUrl}/business_intelligence/schema`,
+    tableUrl: `${apiUrl}/business_intelligence/tables`,
     host: (new URL(apiUrl)).hostname
   }
 }
@@ -62,7 +62,7 @@ async function fetchSchema (config: Config, headers) {
 }
 
 async function fetchTableData (config: Config, tableDefinition: TableDefinition, headers) {
-  const res = await fetch(`${config.tableUrl}${tableDefinition.name}`, { headers })
+  const res = await fetch(`${config.tableUrl}/${tableDefinition.name}`, { headers })
 
   if (!res.ok) {
     return Promise.reject(new Error(`Error with the request. Status code: ${res.status}`))
