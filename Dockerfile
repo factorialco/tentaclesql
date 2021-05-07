@@ -1,16 +1,31 @@
-FROM node:14.16.1
+# Build stage
+FROM node:14.16.1-alpine AS build
 
-MAINTAINER Genar <genar@factorial.co>
+MAINTAINER Factorial <admin@factorial.co>
 
 COPY . /app
 
 WORKDIR /app
 
-RUN yarn install --frozen-lockfile
+RUN apk update && apk add --update-cache --virtual build-dependencies python make g++ && \
+    yarn install --frozen-lockfile && \
+    yarn cache clean && \
+    apk del build-dependencies
 
-ENV NODE_ENV production
-ENV API_DOMAIN https://api.example.com
+# Release stage
+FROM node:14.16.1-alpine
+
+MAINTAINER Factorial <admin@factorial.co>
+
+COPY --from=build /app/package.json /app/yarn.lock /app/dist/ /app/
+
+WORKDIR /app
+
+RUN apk update && apk add --update-cache --virtual build-dependencies python make g++ && \
+    yarn install --frozen-lockfile --production && \
+    yarn cache clean && \
+    apk del build-dependencies
 
 EXPOSE 8080/tcp
 
-ENTRYPOINT ["yarn", "start"]
+ENTRYPOINT ["node", "/app/dist/server.js"]
