@@ -9,6 +9,7 @@ WORKDIR /app
 
 RUN apk update && apk add --update-cache --virtual build-dependencies python make g++ && \
     yarn install --frozen-lockfile && \
+    yarn build && \
     yarn cache clean && \
     apk del build-dependencies
 
