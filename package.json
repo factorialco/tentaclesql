@@ -1,7 +1,7 @@
 {
-  "name": "data-engine-lite",
-  "version": "1.0.0",
-  "description": "Factorial SQL engine",
+  "name": "tentaclesql",
+  "version": "0.1.5",
+  "description": "SQL engine from multiple sources",
   "dependencies": {
     "better-sqlite3": "^7.1.5",
     "fastify": "^3.14.2",
@@ -35,7 +35,7 @@
     "typescript": "^4.2.4"
   },
   "scripts": {
-      "build": "rimraf dist && tsup src/queryTables.ts --format cjs,esm --dts",
+      "build": "rimraf dist && tsup server.ts --format cjs,esm --dts",
       "cli": "LOG_LEVEL='debug' esno cli.ts",
       "lint": "eslint . --ext .ts",
       "start": "esno server.ts",
