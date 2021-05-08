@@ -29,4 +29,150 @@ tables:
       - key: description
         type: text
 
-
+  # EXAMPLE:
+  # SCHEMA_URL='https://github.com' yarn cli --query "SELECT name, stargazers_count FROM repos ORDER BY stargazers_count DESC"
+  - name: repos
+    url: https://api.github.com/users/gtrias/repos
+    fields:
+    - key: id
+      type: number
+    - key: node_id
+      type: number
+    - key: name
+      type: text
+    - key: full_name
+      type: text
+    - key: private
+      type: text
+    - key: html_url
+      type: text
+    - key: description
+      type: text
+    - key: fork
+      type: text
+    - key: url
+      type: text
+    - key: forks_url
+      type: text
+    - key: keys_url
+      type: text
+    - key: collaborators_url
+      type: text
+    - key: teams_url
+      type: text
+    - key: hooks_url
+      type: text
+    - key: issue_events_url
+      type: text
+    - key: events_url
+      type: text
+    - key: assignees_url
+      type: text
+    - key: branches_url
+      type: text
+    - key: tags_url
+      type: text
+    - key: blobs_url
+      type: text
+    - key: git_tags_url
+      type: text
+    - key: git_refs_url
+      type: text
+    - key: trees_url
+      type: text
+    - key: statuses_url
+      type: text
+    - key: languages_url
+      type: text
+    - key: stargazers_url
+      type: text
+    - key: contributors_url
+      type: text
+    - key: subscribers_url
+      type: text
+    - key: subscription_url
+      type: text
+    - key: commits_url
+      type: text
+    - key: git_commits_url
+      type: text
+    - key: comments_url
+      type: text
+    - key: issue_comment_url
+      type: text
+    - key: contents_url
+      type: text
+    - key: compare_url
+      type: text
+    - key: merges_url
+      type: text
+    - key: archive_url
+      type: text
+    - key: downloads_url
+      type: text
+    - key: issues_url
+      type: text
+    - key: pulls_url
+      type: text
+    - key: milestones_url
+      type: text
+    - key: notifications_url
+      type: text
+    - key: labels_url
+      type: text
+    - key: releases_url
+      type: text
+    - key: deployments_url
+      type: text
+    - key: created_at
+      type: text
+    - key: updated_at
+      type: text
+    - key: pushed_at
+      type: text
+    - key: git_url
+      type: text
+    - key: ssh_url
+      type: text
+    - key: clone_url
+      type: text
+    - key: svn_url
+      type: text
+    - key: homepage
+      type: text
+    - key: size
+      type: text
+    - key: stargazers_count
+      type: text
+    - key: watchers_count
+      type: text
+    - key: language
+      type: text
+    - key: has_issues
+      type: text
+    - key: has_projects
+      type: text
+    - key: has_downloads
+      type: text
+    - key: has_wiki
+      type: text
+    - key: has_pages
+      type: text
+    - key: forks_count
+      type: text
+    - key: mirror_url
+      type: text
+    - key: archived
+      type: text
+    - key: disabled
+      type: text
+    - key: open_issues_count
+      type: text
+    - key: forks
+      type: text
+    - key: open_issues
+      type: text
+    - key: watchers
+      type: text
+    - key: default_branch
+      type: text
