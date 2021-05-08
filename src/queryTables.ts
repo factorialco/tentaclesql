@@ -1,6 +1,9 @@
 import fetch from 'node-fetch'
 import Database from 'better-sqlite3'
 import sqliteParser from 'sqlite-parser'
+import YAML from 'yaml'
+import { readFileSync } from 'fs'
+import path from 'path'
 
 import type { Database as DatabaseType } from 'better-sqlite3'
 
@@ -48,13 +51,19 @@ function validateQuery (ast) {
 }
 
 async function fetchSchema (headers) {
-  const res = await fetch(getSchemaUrl(), { headers })
+  const filePath = path.join(__dirname, '..', 'schemas', 'test.yml')
+  const file = readFileSync(filePath, 'utf8')
+  const res = YAML.parse(file)
+  console.log(res)
 
-  if (!res.ok) {
-    return Promise.reject(new Error(`Error with the request. Status code: ${res.status}`))
-  }
+  // const res = await fetch(getSchemaUrl(), { headers })
 
-  return res.json()
+  // if (!res.ok) {
+    // return Promise.reject(new Error(`Error with the request. Status code: ${res.status}`))
+  // }
+
+  // return res.json()
+  return res.tables
 }
 
 async function fetchTableData (tableDefinition: TableDefinition, headers) {
@@ -144,7 +153,7 @@ async function queryTables (sql: string, parameters: Parameters, headers) {
 
     await populateTables(db, usedTables, {
       ...headers,
-      host: getHost(),
+      // host: getHost(),
       'user-agent': 'tentaclesql/0.1.5' // FIXME: Read it from package.json
     })
   }
