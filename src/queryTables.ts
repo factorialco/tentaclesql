@@ -7,6 +7,7 @@ import path from 'path'
 
 import type { Database as DatabaseType } from 'better-sqlite3'
 
+import flattenObject from './flattenObject'
 import extractTables from './extractTables'
 import logger from './logger'
 
@@ -82,27 +83,40 @@ async function populateTables (db: DatabaseType, usedTables: Array<string>, head
   const filteredTableDefinition = schema.filter(tableDefinition => usedTables.includes(tableDefinition.name))
 
   const promises = filteredTableDefinition.map(async (tableDefinition) => {
-    createTable(db, tableDefinition)
-
     const data = await fetchTableData(tableDefinition, headers)
+    const fixedData = data.map(field => flattenObject(field, '_'))
 
-    if (data.length === 0) return
+    if (fixedData.length === 0) return
+
+    const dynamicDefinition = {
+      name: tableDefinition.name,
+      data: fixedData[0]
+    }
+
+    createTable(db, dynamicDefinition)
 
     // No support for booleans :/
-    mutateDataframe(data, (row, k) => {
+    mutateDataframe(fixedData, (row, k) => {
       if (typeof row[k] === 'boolean') row[k] = row[k] ? 'TRUE' : 'FALSE'
     })
 
-    storeToDb(db, tableDefinition, data)
+    storeToDb(db, dynamicDefinition, fixedData)
   })
 
   return Promise.all(promises)
 }
 
-function storeToDb (db: DatabaseType, tableDefinition: TableDefinition, data) {
-  const schema = tableDefinition.fields.map(field => `@${field.key}`).join(', ')
+function storeToDb (db: DatabaseType, tableDefinition: any, data) {
+  const schema = Object.keys(tableDefinition.data).map(field => `@${field}`).join(', ')
   const insert = db.prepare(`INSERT INTO ${tableDefinition.name} VALUES (${schema})`)
-  for (const row of data) insert.run(row)
+
+  console.log(data)
+
+  for (const row of data) {
+    const normalizedRow = { ...tableDefinition.data, ...row }
+    console.log(normalizedRow)
+    insert.run(normalizedRow)
+  }
 }
 
 const TYPES = { // Perdona Pau ;)
@@ -125,9 +139,10 @@ function parseSchema (tableDefinition: TableDefinition): Array<string> {
   })
 }
 
-function createTable (db: DatabaseType, tableDefinition: TableDefinition) {
-  const schemas = parseSchema(tableDefinition).join(', ')
-  const query = `CREATE TABLE ${tableDefinition.name} (${schemas})`
+function createTable (db: DatabaseType, tableDefinition: any) {
+  // const schemas = parseSchema(tableDefinition).join(', ')
+  console.log('tableDefinition: ', tableDefinition)
+  const query = `CREATE TABLE ${tableDefinition.name} (${Object.keys(tableDefinition.data)})`
 
   db.prepare(query).run()
 }
