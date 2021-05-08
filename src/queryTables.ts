@@ -19,6 +19,7 @@ type FieldDefinition = {
 type TableDefinition = {
   name: string,
   url: string,
+  result_key: string,
   fields: Array<FieldDefinition>
 }
 
@@ -84,7 +85,8 @@ async function populateTables (db: DatabaseType, usedTables: Array<string>, head
 
   const promises = filteredTableDefinition.map(async (tableDefinition) => {
     const data = await fetchTableData(tableDefinition, headers)
-    const fixedData = data.map(field => flattenObject(field, '_'))
+    const resultKey = tableDefinition.result_key
+    const fixedData = resultKey ? data[resultKey].map(field => flattenObject(field, '_')) : data.map(field => flattenObject(field, '_'))
 
     if (fixedData.length === 0) return
 

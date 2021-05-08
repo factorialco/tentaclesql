@@ -8,3 +8,18 @@ tables:
   # SCHEMA_URL='https://github.com' yarn cli --query "SELECT name, stargazers_count FROM repos ORDER BY stargazers_count DESC"
   - name: repos
     url: https://api.github.com/users/gtrias/repos
+
+  - name: beers
+    url: https://api.punkapi.com/v2/beers?brewed_before=11-2012&abv_gt=6
+
+  - name: aoe2_civilizations
+    url: https://age-of-empires-2-api.herokuapp.com/api/v1/civilizations
+    result_key: civilizations
+
+  # SCHEMA_URL='https://github.com' yarn cli --query "SELECT title, savings FROM steam_deals ORDER BY savings DESC"
+  - name: steam_deals
+    url: https://www.cheapshark.com/api/1.0/deals
+
+  - name: open_trivia
+    url: https://opentdb.com/api.php?amount=10
+    result_key: results
