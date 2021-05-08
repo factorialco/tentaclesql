@@ -1,0 +1,32 @@
+tables:
+  # EXAMPLES:
+  # SCHEMA_URL='https://github.com' yarn cli --query "SELECT * FROM orgs WHERE repos_url LIKE '%factorialco%'"
+  - name: orgs
+    url: https://api.github.com/users/gtrias/orgs
+    fields:
+      - key: login
+        type: text
+      - key: id
+        type: number
+      - key: node_id
+        type: number
+      - key: url
+        type: text
+      - key: repos_url
+        type: text
+      - key: events_url
+        type: text
+      - key: hooks_url
+        type: text
+      - key: issues_url
+        type: text
+      - key: members_url
+        type: text
+      - key: public_members_url
+        type: text
+      - key: avatar_url
+        type: text
+      - key: description
+        type: text
+
+
