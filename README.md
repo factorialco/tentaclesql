@@ -1,6 +1,6 @@
 # TentacleSQL
 
-Query your HTTP endpoints data using SQLite
+Query your HTTP endpoints data using SQL
 
 ## Setup
 
