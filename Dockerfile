@@ -18,7 +18,7 @@ FROM node:14.16.1-alpine
 
 MAINTAINER Factorial <admin@factorial.co>
 
-COPY --from=build /app/package.json /app/yarn.lock /app/dist/ /app/
+COPY --from=build /app/package.json /app/yarn.lock /app/dist /app/
 
 WORKDIR /app
 
@@ -29,4 +29,4 @@ RUN apk update && apk add --update-cache --virtual build-dependencies python mak
 
 EXPOSE 8080/tcp
 
-ENTRYPOINT ["node", "/app/dist/server.js"]
+ENTRYPOINT ["node", "/app/server.js"]
