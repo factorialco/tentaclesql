@@ -11,6 +11,15 @@ interface Body {
 
 // SQL Query endpoint
 server.post<{ Body: Body }>('/', (request, reply) => {
+  if (!request.body.query) {
+    server.log.error(`Invalid SQL query`)
+
+    return reply
+      .code(422)
+      .header('Content-Type', 'application/json; charset=utf-8')
+      .send({ errors: 'Invalid SQL query' })
+  }
+
   return queryTables(
     request.body.query,
     request.body.parameters || [],
