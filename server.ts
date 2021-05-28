@@ -10,9 +10,9 @@ interface Body {
 }
 
 // SQL Query endpoint
-server.post<{ Body: Body }>('/', (request, reply) => {
+server.post<{ Body: Body }>('/', async (request, reply) => {
   if (!request.body.query) {
-    server.log.error(`Invalid SQL query`)
+    server.log.error('Invalid SQL query')
 
     return reply
       .code(422)

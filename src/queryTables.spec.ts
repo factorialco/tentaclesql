@@ -74,3 +74,11 @@ test('queryTables / no select', async () => {
 
   await expect(() => queryTables(sql, [], {})).rejects.toThrow(/Only SELECT/)
 })
+
+test('queryTables / multiple select on a union', async () => {
+  const sql = 'SELECT 1+1 as value UNION SELECT 1+2 as value;'
+
+  const result = await queryTables(sql, [], {})
+
+  expect(result).toEqual([{ value: 2 }, { value: 3 }])
+})
