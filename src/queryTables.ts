@@ -44,7 +44,7 @@ function parse (sql: string) {
 function validateQuery (ast) {
   if (ast.type !== 'statement' || ast.variant !== 'list') throw new Error('Malformed query')
   if (ast.statement.length > 1) throw new Error('Only one statement is supported')
-  if (ast.statement[0].variant !== 'select') throw new Error('Only SELECT queries are supported')
+  if (!['select', 'compound'].includes(ast.statement[0].variant)) throw new Error('Only SELECT queries are supported')
 }
 
 async function fetchSchema (headers) {
