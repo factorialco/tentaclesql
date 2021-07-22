@@ -1,4 +1,5 @@
 import fetch from 'node-fetch'
+import path from 'path'
 import Database from 'better-sqlite3'
 import sqliteParser from 'sqlite-parser'
 
@@ -123,6 +124,19 @@ function createTable (db: DatabaseType, tableDefinition: TableDefinition) {
   db.prepare(query).run()
 }
 
+function loadExtensions (db: DatabaseType) {
+  // https://github.com/nalgeon/sqlean
+  const extensionBase = path.join(__dirname, '/sqlite_extensions/')
+  db.loadExtension(path.join(extensionBase, 'crypto'))
+  db.loadExtension(path.join(extensionBase, 'json1'))
+  db.loadExtension(path.join(extensionBase, 'math'))
+  db.loadExtension(path.join(extensionBase, 're'))
+  db.loadExtension(path.join(extensionBase, 'stats'))
+  db.loadExtension(path.join(extensionBase, 'text'))
+  db.loadExtension(path.join(extensionBase, 'unicode'))
+  db.loadExtension(path.join(extensionBase, 'vsv'))
+}
+
 async function queryTables (sql: string, parameters: Parameters, headers) {
   logger.info({
     sql: sql,
@@ -136,6 +150,7 @@ async function queryTables (sql: string, parameters: Parameters, headers) {
 
   // Empty name = temporary
   const db = new Database('', { verbose: (message) => { logger.debug(message) } })
+  loadExtensions(db)
 
   const usedTables = extractTables(ast)
 
