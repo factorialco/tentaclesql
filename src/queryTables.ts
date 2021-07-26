@@ -16,6 +16,8 @@ type FieldDefinition = {
 type TableDefinition = {
   name: string,
   url: string,
+  result_key: string,
+  data: any,
   fields: Array<FieldDefinition>
 }
 
@@ -82,7 +84,7 @@ async function populateTables (db: DatabaseType, usedTables: Array<string>, head
     if (fixedData.length === 0) return
 
     const dynamicDefinition = {
-      name: tableDefinition.name,
+      ...tableDefinition,
       data: fixedData[0] // We base table definition on first row
     }
 
@@ -108,16 +110,6 @@ function storeToDb (db: DatabaseType, tableDefinition: TableDefinition, data) {
     const normalizedRow = { ...tableDefinition.data, ...row }
     insert.run(normalizedRow)
   }
-}
-
-const TYPES = { // Perdona Pau ;)
-  bigint: 'BIGINT',
-  date: 'DATE',
-  number: 'INTEGER',
-  integer: 'INTEGER',
-  string: 'TEXT',
-  text: 'TEXT',
-  boolean: 'BOOLEAN'
 }
 
 function createTable (db: DatabaseType, tableDefinition: TableDefinition) {
