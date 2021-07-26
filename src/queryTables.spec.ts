@@ -46,7 +46,7 @@ test('queryTables', async () => {
     .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify(employeeBody))))
     .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify(goalsConfigBody))))
 
-  const sql = 'SELECT employees.id + goal_configs.id as value FROM goal_configs JOIN employees ON (employees.id + ?) == goal_configs.id'
+  const sql = 'SELECT employees.id + goal_configs.id as value FROM goal_configs JOIN employees ON (employees.id + ?) = goal_configs.id + 0'
 
   const result = await queryTables(sql, [5], {})
 
@@ -54,6 +54,7 @@ test('queryTables', async () => {
   expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/schema', { headers })
   expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/tables/goal_configs', { headers })
   expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/tables/employees', { headers })
+
   expect(result).toEqual([{ value: 25 }])
 })
 

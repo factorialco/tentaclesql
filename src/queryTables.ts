@@ -6,6 +6,7 @@ import type { Database as DatabaseType } from 'better-sqlite3'
 
 import extractTables from './extractTables'
 import logger from './logger'
+import flattenObject from './flattenObject'
 
 type FieldDefinition = {
   type: string,
@@ -73,27 +74,40 @@ async function populateTables (db: DatabaseType, usedTables: Array<string>, head
   const filteredTableDefinition = schema.filter(tableDefinition => usedTables.includes(tableDefinition.name))
 
   const promises = filteredTableDefinition.map(async (tableDefinition) => {
-    createTable(db, tableDefinition)
-
     const data = await fetchTableData(tableDefinition, headers)
 
-    if (data.length === 0) return
+    const resultKey = tableDefinition.result_key
+    const fixedData = resultKey ? data[resultKey].map(field => flattenObject(field, '_')) : data.map(field => flattenObject(field, '_'))
+
+    if (fixedData.length === 0) return
+
+    const dynamicDefinition = {
+      name: tableDefinition.name,
+      data: fixedData[0] // We base table definition on first row
+    }
+
+    createTable(db, dynamicDefinition)
 
     // No support for booleans :/
-    mutateDataframe(data, (row, k) => {
+    mutateDataframe(fixedData, (row, k) => {
       if (typeof row[k] === 'boolean') row[k] = row[k] ? 'TRUE' : 'FALSE'
     })
 
-    storeToDb(db, tableDefinition, data)
+    storeToDb(db, dynamicDefinition, fixedData)
   })
 
   return Promise.all(promises)
 }
 
 function storeToDb (db: DatabaseType, tableDefinition: TableDefinition, data) {
-  const schema = tableDefinition.fields.map(field => `@${field.key}`).join(', ')
+  const schema = Object.keys(tableDefinition.data).map(field => `@${field}`).join(', ')
+
   const insert = db.prepare(`INSERT INTO ${tableDefinition.name} VALUES (${schema})`)
-  for (const row of data) insert.run(row)
+
+  for (const row of data) {
+    const normalizedRow = { ...tableDefinition.data, ...row }
+    insert.run(normalizedRow)
+  }
 }
 
 const TYPES = { // Perdona Pau ;)
@@ -106,19 +120,8 @@ const TYPES = { // Perdona Pau ;)
   boolean: 'BOOLEAN'
 }
 
-function parseSchema (tableDefinition: TableDefinition): Array<string> {
-  return tableDefinition.fields.map(field => {
-    const type = TYPES[field.type]
-
-    if (!type) throw new Error(`Invalid field type ${field.type}`)
-
-    return `${field.key} ${type}`
-  })
-}
-
 function createTable (db: DatabaseType, tableDefinition: TableDefinition) {
-  const schemas = parseSchema(tableDefinition).join(', ')
-  const query = `CREATE TABLE ${tableDefinition.name} (${schemas})`
+  const query = `CREATE TABLE ${tableDefinition.name} (${Object.keys(tableDefinition.data)})`
 
   db.prepare(query).run()
 }
