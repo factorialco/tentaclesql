@@ -1,10 +1,14 @@
 import fastify from 'fastify'
 import queryTables from './src/queryTables'
+import type { Extension } from './src/queryTables'
 import logger from './src/logger'
 
 interface Body {
   query: string
   parameters?: Array<string>
+  config: {
+    extensions: Array<Extension>
+  }
 }
 
 const build = () => {
@@ -24,7 +28,8 @@ const build = () => {
     return queryTables(
       request.body.query,
       request.body.parameters || [],
-      request.headers
+      request.headers,
+      request.body.config
     ).then(result => {
       server.log.info(result)
 
@@ -49,7 +54,7 @@ export { build }
 const start = async () => {
   const server = build()
   try {
-    await server.listen(process.env.PORT || 8080, '0.0.0.0')
+    await server.listen(process.env.PORT || 3000, '0.0.0.0')
   } catch (err) {
     await server.log.error(err)
 

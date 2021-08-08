@@ -8,6 +8,19 @@ import type { Database as DatabaseType } from 'better-sqlite3'
 import extractTables from './extractTables'
 import logger from './logger'
 
+const EXTENSIONS = {
+  crypto: 'crypto',
+  json1: 'json1',
+  math: 'math',
+  re: 're',
+  status: 'stats',
+  text: 'text',
+  unicode: 'unicode',
+  vsv: 'vsv'
+}
+
+export type Extension = string
+
 type FieldDefinition = {
   type: string,
   key: string,
@@ -124,20 +137,32 @@ function createTable (db: DatabaseType, tableDefinition: TableDefinition) {
   db.prepare(query).run()
 }
 
-function loadExtensions (db: DatabaseType) {
+function loadExtensions (
+  db: DatabaseType,
+  extensions: Array<Extension>
+) {
   // https://github.com/nalgeon/sqlean
   const extensionBase = path.join(__dirname, '/sqlite_extensions/')
-  db.loadExtension(path.join(extensionBase, 'crypto'))
-  db.loadExtension(path.join(extensionBase, 'json1'))
-  db.loadExtension(path.join(extensionBase, 'math'))
-  db.loadExtension(path.join(extensionBase, 're'))
-  db.loadExtension(path.join(extensionBase, 'stats'))
-  db.loadExtension(path.join(extensionBase, 'text'))
-  db.loadExtension(path.join(extensionBase, 'unicode'))
-  db.loadExtension(path.join(extensionBase, 'vsv'))
+
+  extensions.forEach(extension => {
+    if (!EXTENSIONS[extension]) {
+      throw Error(`${extension} extension not found!`)
+    }
+
+    db.loadExtension(path.join(extensionBase, EXTENSIONS[extension]))
+  })
 }
 
-async function queryTables (sql: string, parameters: Parameters, headers) {
+const DEFAULT_CONFIG = {
+  extensions: []
+}
+
+async function queryTables (
+  sql: string,
+  parameters: Parameters,
+  headers: any,
+  config: { extensions: Array<Extension> } = DEFAULT_CONFIG
+) {
   logger.info({
     sql: sql,
     parameters: parameters,
@@ -150,7 +175,8 @@ async function queryTables (sql: string, parameters: Parameters, headers) {
 
   // Empty name = temporary
   const db = new Database('', { verbose: (message) => { logger.debug(message) } })
-  loadExtensions(db)
+
+  loadExtensions(db, config.extensions)
 
   const usedTables = extractTables(ast)
 

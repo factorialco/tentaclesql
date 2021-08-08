@@ -83,3 +83,23 @@ to denote relations between tables.
 - `type`: Type of the field. Available types: `text`, `number`, `data` and `boolean`
 - `table`: Target table of the foreign key
 - `foreign_key`: Referenced column by the foreign key
+
+## Usage
+
+Once you have your tentaclesql server up and running you can use it by sending
+POST requests against `/`.
+
+Example:
+
+```bash
+curl -H "Content-type: application/json" -X POST -d '{"query": "SELECT 1;"}' http://localhost:3000/
+```
+
+The expected payload contains the following parameters:
+
+- **query**: The SQL query to be executed against the in-memory database.
+- **parameters**: The parameters to be replaced in the query.
+- **config**: Configuration parameters.
+  - **extensions**: Array of extensions to enable. Check
+  https://github.com/nalgeon/sqlean to see all the supported extensions and how
+  to use them.
