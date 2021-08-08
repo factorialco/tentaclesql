@@ -2,50 +2,60 @@ import fastify from 'fastify'
 import queryTables from './src/queryTables'
 import logger from './src/logger'
 
-const server = fastify({ logger: logger })
-
 interface Body {
   query: string
   parameters?: Array<string>
 }
 
-// SQL Query endpoint
-server.post<{ Body: Body }>('/', async (request, reply) => {
-  if (!request.body.query) {
-    server.log.error('Invalid SQL query')
+const build = () => {
+  const server = fastify({ logger: logger })
 
-    return reply
-      .code(422)
-      .header('Content-Type', 'application/json; charset=utf-8')
-      .send({ errors: 'Invalid SQL query' })
-  }
+  // SQL Query endpoint
+  server.post<{ Body: Body }>('/', async (request, reply) => {
+    if (!request.body.query) {
+      server.log.error('Invalid SQL query')
 
-  return queryTables(
-    request.body.query,
-    request.body.parameters || [],
-    request.headers
-  ).then(result => {
-    server.log.info(result)
+      return reply
+        .code(422)
+        .header('Content-Type', 'application/json; charset=utf-8')
+        .send({ errors: 'Invalid SQL query' })
+    }
 
-    reply.send(result)
-  }).catch(error => {
-    server.log.error(error)
+    return queryTables(
+      request.body.query,
+      request.body.parameters || [],
+      request.headers
+    ).then(result => {
+      server.log.info(result)
 
-    reply.send(error)
+      reply.send(result)
+    }).catch(error => {
+      server.log.error(error)
+
+      reply.send(error)
+    })
   })
-})
 
-// Health check route
-server.get('/health-check', async (request, reply) => {
-  return 'OK'
-})
+  // Health check route
+  server.get('/health-check', async (_request, _reply) => {
+    return 'OK'
+  })
+
+  return server
+}
+
+export { build }
 
 const start = async () => {
+  const server = build()
   try {
     await server.listen(process.env.PORT || 8080, '0.0.0.0')
   } catch (err) {
-    server.log.error(err)
-    process.exit(1)
+    await server.log.error(err)
+
+    if (process.env.NODE_ENV === 'production') {
+      process.exit(1)
+    }
   }
 }
 
