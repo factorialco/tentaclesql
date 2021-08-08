@@ -1,4 +1,4 @@
-import { build } from './server'
+import build from './index'
 
 describe('server', () => {
   let app: any

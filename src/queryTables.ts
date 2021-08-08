@@ -13,7 +13,7 @@ const EXTENSIONS = {
   json1: 'json1',
   math: 'math',
   re: 're',
-  status: 'stats',
+  stats: 'stats',
   text: 'text',
   unicode: 'unicode',
   vsv: 'vsv'
