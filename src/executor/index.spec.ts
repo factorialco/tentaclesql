@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import queryTables from './queryTables'
+import executor from './index'
 
 jest.mock('node-fetch')
 
@@ -38,7 +38,7 @@ const headers = {
   'user-agent': 'tentaclesql/0.1.5'
 }
 
-test('queryTables', async () => {
+test('executor', async () => {
   const { Response } = jest.requireActual('node-fetch')
 
   mockedFetch
@@ -48,7 +48,7 @@ test('queryTables', async () => {
 
   const sql = 'SELECT employees.id + goal_configs.id as value FROM goal_configs JOIN employees ON (employees.id + ?) == goal_configs.id'
 
-  const result = await queryTables(sql, [5], {})
+  const result = await executor(sql, [5], {})
 
   expect(mockedFetch).toHaveBeenCalledTimes(3)
   expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/schema', { headers })
@@ -57,28 +57,28 @@ test('queryTables', async () => {
   expect(result).toEqual([{ value: 25 }])
 })
 
-test('queryTables / syntax error', async () => {
+test('executor / syntax error', async () => {
   const sql = 'SEL FOO BAR'
 
-  await expect(() => queryTables(sql, [], {})).rejects.toThrow(/Syntax error/)
+  await expect(() => executor(sql, [], {})).rejects.toThrow(/Syntax error/)
 })
 
-test('queryTables / multiple select', async () => {
+test('executor / multiple select', async () => {
   const sql = 'SELECT 1+1;SELECT 1+1;'
 
-  await expect(() => queryTables(sql, [], {})).rejects.toThrow(/Only one statement/)
+  await expect(() => executor(sql, [], {})).rejects.toThrow(/Only one statement/)
 })
 
-test('queryTables / no select', async () => {
+test('executor / no select', async () => {
   const sql = 'UPDATE employees SET name="foo"'
 
-  await expect(() => queryTables(sql, [], {})).rejects.toThrow(/Only SELECT/)
+  await expect(() => executor(sql, [], {})).rejects.toThrow(/Only SELECT/)
 })
 
-test('queryTables / multiple select on a union', async () => {
+test('executor / multiple select on a union', async () => {
   const sql = 'SELECT 1+1 as value UNION SELECT 1+2 as value;'
 
-  const result = await queryTables(sql, [], {})
+  const result = await executor(sql, [], {})
 
   expect(result).toEqual([{ value: 2 }, { value: 3 }])
 })

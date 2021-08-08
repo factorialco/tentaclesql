@@ -1,23 +1,11 @@
 import fetch from 'node-fetch'
-import path from 'path'
-import Database from 'better-sqlite3'
-import sqliteParser from 'sqlite-parser'
+import { version } from '../../package.json'
 
 import type { Database as DatabaseType } from 'better-sqlite3'
 
-import extractTables from './extractTables'
-import logger from './logger'
-
-const EXTENSIONS = {
-  crypto: 'crypto',
-  json1: 'json1',
-  math: 'math',
-  re: 're',
-  stats: 'stats',
-  text: 'text',
-  unicode: 'unicode',
-  vsv: 'vsv'
-}
+import { extractTables } from './queryParser'
+import { createDatabase } from './database'
+import logger from '../logger'
 
 export type Extension = string
 
@@ -49,16 +37,6 @@ function getHost (): string {
 
 function mutateDataframe (df, fn) {
   return df.forEach(row => { Object.keys(row).forEach(k => fn(row, k)) })
-}
-
-function parse (sql: string) {
-  return sqliteParser(sql)
-}
-
-function validateQuery (ast) {
-  if (ast.type !== 'statement' || ast.variant !== 'list') throw new Error('Malformed query')
-  if (ast.statement.length > 1) throw new Error('Only one statement is supported')
-  if (!['select', 'compound'].includes(ast.statement[0].variant)) throw new Error('Only SELECT queries are supported')
 }
 
 async function fetchSchema (headers) {
@@ -137,27 +115,11 @@ function createTable (db: DatabaseType, tableDefinition: TableDefinition) {
   db.prepare(query).run()
 }
 
-function loadExtensions (
-  db: DatabaseType,
-  extensions: Array<Extension>
-) {
-  // https://github.com/nalgeon/sqlean
-  const extensionBase = path.join(__dirname, '/sqlite_extensions/')
-
-  extensions.forEach(extension => {
-    if (!EXTENSIONS[extension]) {
-      throw Error(`${extension} extension not found!`)
-    }
-
-    db.loadExtension(path.join(extensionBase, EXTENSIONS[extension]))
-  })
-}
-
 const DEFAULT_CONFIG = {
   extensions: []
 }
 
-async function queryTables (
+async function executor (
   sql: string,
   parameters: Parameters,
   headers: any,
@@ -169,16 +131,9 @@ async function queryTables (
     headers: headers
   })
 
-  const ast = parse(sql)
+  const db = createDatabase(config.extensions)
 
-  validateQuery(ast)
-
-  // Empty name = temporary
-  const db = new Database('', { verbose: (message) => { logger.debug(message) } })
-
-  loadExtensions(db, config.extensions)
-
-  const usedTables = extractTables(ast)
+  const usedTables = extractTables(sql)
 
   if (usedTables.length > 0) {
     delete headers['content-length']
@@ -186,7 +141,7 @@ async function queryTables (
     await populateTables(db, usedTables, {
       ...headers,
       host: getHost(),
-      'user-agent': 'tentaclesql/0.1.5' // FIXME: Read it from package.json
+      'user-agent': `tentaclesql/${version}`
     })
   }
 
@@ -195,4 +150,4 @@ async function queryTables (
   return stmt.all(parameters)
 }
 
-export default queryTables
+export default executor

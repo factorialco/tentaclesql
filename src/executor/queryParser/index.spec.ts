@@ -1,10 +1,8 @@
-import sqliteParser from 'sqlite-parser'
-import extractTables from './extractTables'
+import { extractTables } from './index'
 
 test('extractTables', () => {
   const subject = (sql) => {
-    const ast = sqliteParser(sql)
-    return extractTables(ast)
+    return extractTables(sql)
   }
 
   expect(subject('SELECT goal_config_id, name FROM goals_config WHERE goal_config_id > (SELECT COUNT(*) - 100 FROM employee) AND 1=1')).toEqual([

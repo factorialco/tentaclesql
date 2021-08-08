@@ -1,6 +1,6 @@
 import fastify from 'fastify'
-import queryTables from '../queryTables'
-import type { Extension } from '../queryTables'
+import executor from '../executor'
+import type { Extension } from '../executor'
 import logger from '../logger'
 
 interface Body {
@@ -25,7 +25,7 @@ const build = () => {
         .send({ errors: 'Invalid SQL query' })
     }
 
-    return queryTables(
+    return executor(
       request.body.query,
       request.body.parameters || [],
       request.headers,
