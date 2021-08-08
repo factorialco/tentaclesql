@@ -11,7 +11,14 @@ type TableDefinition = {
   fields: Array<FieldDefinition>
 }
 
-export async function fetchSchema (headers) {
+export async function fetchSchema (
+  headers: any,
+  schema: any
+) {
+  if (schema.length > 0) {
+    return schema
+  }
+
   const res = await fetch(getSchemaUrl(), { headers })
 
   if (!res.ok) {

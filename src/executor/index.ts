@@ -46,9 +46,12 @@ async function fetchTableData (tableDefinition: TableDefinition, headers) {
   return res.json()
 }
 
-async function populateTables (db: DatabaseType, usedTables: Array<string>, headers) {
-  const schema: Schema = await fetchSchema(headers)
-
+async function populateTables (
+  db: DatabaseType,
+  usedTables: Array<string>,
+  headers: any,
+  schema: any
+) {
   const filteredTableDefinition = schema.filter(tableDefinition => usedTables.includes(tableDefinition.name))
 
   const promises = filteredTableDefinition.map(async (tableDefinition) => {
@@ -83,14 +86,18 @@ function createTable (db: DatabaseType, tableDefinition: TableDefinition) {
 }
 
 const DEFAULT_CONFIG = {
-  extensions: []
+  extensions: [],
+  schema: []
 }
 
 async function executor (
   sql: string,
   parameters: Parameters,
   headers: any,
-  config: { extensions: Array<Extension> } = DEFAULT_CONFIG
+  config: {
+    extensions: Array<Extension>,
+    schema: Array<TableDefinition>
+  } = DEFAULT_CONFIG
 ) {
   logger.info({
     sql: sql,
@@ -101,15 +108,19 @@ async function executor (
   const db = createDatabase(config.extensions)
 
   const usedTables = extractTables(sql)
-
   if (usedTables.length > 0) {
     delete headers['content-length']
+    const schema: Schema = await fetchSchema(headers, config.schema)
 
-    await populateTables(db, usedTables, {
-      ...headers,
-      host: getHost(),
-      'user-agent': `tentaclesql/${version}`
-    })
+    await populateTables(
+      db,
+      usedTables, {
+        ...headers,
+        host: getHost(),
+        'user-agent': `tentaclesql/${version}`
+      },
+      schema
+    )
   }
 
   const stmt = db.prepare(sql)

@@ -42,13 +42,19 @@ test('executor', async () => {
   const { Response } = jest.requireActual('node-fetch')
 
   mockedFetch
-    .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify(schemaBody))))
-    .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify(employeeBody))))
-    .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify(goalsConfigBody))))
+    .mockReturnValueOnce(
+      Promise.resolve(new Response(JSON.stringify(schemaBody)))
+    )
+    .mockReturnValueOnce(
+      Promise.resolve(new Response(JSON.stringify(employeeBody)))
+    )
+    .mockReturnValueOnce(
+      Promise.resolve(new Response(JSON.stringify(goalsConfigBody)))
+    )
 
   const sql = 'SELECT employees.id + goal_configs.id as value FROM goal_configs JOIN employees ON (employees.id + ?) == goal_configs.id'
 
-  const result = await executor(sql, [5], {})
+  const result = await executor(sql, [5], headers)
 
   expect(mockedFetch).toHaveBeenCalledTimes(3)
   expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/schema', { headers })

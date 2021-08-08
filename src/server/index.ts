@@ -7,7 +7,8 @@ interface Body {
   query: string
   parameters?: Array<string>
   config: {
-    extensions: Array<Extension>
+    extensions: Array<Extension>,
+    schema: Array<any> // FIXME
   }
 }
 
