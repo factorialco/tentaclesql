@@ -5,6 +5,11 @@ import type { Database as DatabaseType } from 'better-sqlite3'
 
 import { extractTables } from './queryParser'
 import { createDatabase } from './database'
+import {
+  fetchSchema,
+  parseSchema,
+  getSchemaUrl
+} from './schema'
 import logger from '../logger'
 
 export type Extension = string
@@ -23,30 +28,12 @@ type TableDefinition = {
 type Schema = Array<TableDefinition>
 type Parameters = Array<any>
 
-function getSchemaUrl (): string {
-  if (!process.env.SCHEMA_URL) {
-    throw new Error('SCHEMA_URL environment variable is mandatory')
-  }
-
-  return process.env.SCHEMA_URL
-}
-
 function getHost (): string {
   return (new URL(getSchemaUrl())).hostname
 }
 
 function mutateDataframe (df, fn) {
   return df.forEach(row => { Object.keys(row).forEach(k => fn(row, k)) })
-}
-
-async function fetchSchema (headers) {
-  const res = await fetch(getSchemaUrl(), { headers })
-
-  if (!res.ok) {
-    return Promise.reject(new Error(`Error with the request. Status code: ${res.status}`))
-  }
-
-  return res.json()
 }
 
 async function fetchTableData (tableDefinition: TableDefinition, headers) {
@@ -86,26 +73,6 @@ function storeToDb (db: DatabaseType, tableDefinition: TableDefinition, data) {
   const schema = tableDefinition.fields.map(field => `@${field.key}`).join(', ')
   const insert = db.prepare(`INSERT INTO ${tableDefinition.name} VALUES (${schema})`)
   for (const row of data) insert.run(row)
-}
-
-const TYPES = { // Perdona Pau ;)
-  bigint: 'BIGINT',
-  date: 'DATE',
-  number: 'INTEGER',
-  integer: 'INTEGER',
-  string: 'TEXT',
-  text: 'TEXT',
-  boolean: 'BOOLEAN'
-}
-
-function parseSchema (tableDefinition: TableDefinition): Array<string> {
-  return tableDefinition.fields.map(field => {
-    const type = TYPES[field.type]
-
-    if (!type) throw new Error(`Invalid field type ${field.type}`)
-
-    return `${field.key} ${type}`
-  })
 }
 
 function createTable (db: DatabaseType, tableDefinition: TableDefinition) {
