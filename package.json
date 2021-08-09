@@ -1,6 +1,6 @@
 {
   "name": "tentaclesql",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "SQL engine from multiple sources",
   "dependencies": {
     "better-sqlite3": "^7.1.5",
