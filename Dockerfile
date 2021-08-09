@@ -13,6 +13,8 @@ RUN apk update && apk add --update-cache --virtual build-dependencies python mak
     yarn cache clean && \
     apk del build-dependencies
 
+COPY ./src/sqlite_extensions /app/dist
+
 # Release stage
 FROM node:14.16.1-alpine
 
