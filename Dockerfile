@@ -1,7 +1,7 @@
 # Build stage
 FROM node:14.16.1-alpine AS build
 
-MAINTAINER Factorial <admin@factorial.co>
+LABEL org.opencontainers.image.authors="Factorial <admin@factorial.co>"
 
 COPY . /app
 
@@ -18,7 +18,7 @@ COPY ./src/sqlite_extensions /app/dist
 # Release stage
 FROM node:14.16.1-alpine
 
-MAINTAINER Factorial <admin@factorial.co>
+LABEL org.opencontainers.image.authors="Factorial <admin@factorial.co>"
 
 COPY --from=build /app/package.json /app/yarn.lock /app/dist /app/
 
