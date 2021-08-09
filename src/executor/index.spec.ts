@@ -1,5 +1,6 @@
 import fetch from 'node-fetch'
 import executor from './index'
+import { version } from '../../package.json'
 
 jest.mock('node-fetch')
 
@@ -35,7 +36,7 @@ const goalsConfigBody = [{ id: '15', title: 'foo' }]
 const employeeBody = [{ id: '10', first_name: 'Paco', last_name: 'Merlo' }]
 const headers = {
   host: 'api.example.com',
-  'user-agent': 'tentaclesql/0.1.5'
+  'user-agent': `tentaclesql/${version}`
 }
 
 test('executor', async () => {
