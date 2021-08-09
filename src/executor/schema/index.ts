@@ -13,7 +13,7 @@ type TableDefinition = {
 
 export async function fetchSchema (
   headers: any,
-  schema: ?any
+  schema: any
 ) {
   if (schema?.length > 0) {
     return schema
