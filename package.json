@@ -1,6 +1,6 @@
 {
   "name": "tentaclesql",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "SQL engine from multiple sources",
   "dependencies": {
     "better-sqlite3": "^7.1.5",
@@ -35,13 +35,13 @@
     "typescript": "^4.2.4"
   },
   "scripts": {
-      "build": "rimraf dist && tsup server.ts --format cjs,esm --dts",
-      "cli": "LOG_LEVEL='debug' esno cli.ts",
-      "lint": "eslint . --ext .ts",
-      "start": "esno server.ts",
-      "test": "jest",
-      "test:watch": "jest --watch",
-      "watch": "yarn build -- --watch"
+    "build": "rimraf dist && tsup server.ts --format cjs,esm --dts",
+    "cli": "LOG_LEVEL='debug' esno cli.ts",
+    "lint": "eslint . --ext .ts",
+    "start": "esno server.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "watch": "yarn build -- --watch"
   },
   "author": "",
   "license": "ISC"
