@@ -1,9 +1,16 @@
 import build from './index'
+import fetch from 'node-fetch'
+
+jest.mock('node-fetch')
+const mockedFetch = fetch as jest.MockedFunction<typeof fetch>
 
 describe('server', () => {
   let app: any
   beforeAll(() => {
     app = build()
+    process.env = Object.assign(process.env, {
+      SCHEMA_URL: 'https://api.example.com/schema'
+    })
   })
 
   describe('GET /health-check', () => {
@@ -40,7 +47,8 @@ describe('server', () => {
           config: {
             extensions: [
               'json1'
-            ]
+            ],
+            schema: []
           }
         }
       })
@@ -50,6 +58,42 @@ describe('server', () => {
           'json_array(1, 2, 3)': '[1,2,3]'
         }
       ])
+      expect(response.statusCode).toBe(200)
+    })
+
+    it('accepts manual schema into the same request', async () => {
+      const schemaBody = [
+        {
+          name: 'employees',
+          url: 'https://api.example.com/tables/employees',
+          fields: [
+            { type: 'number', key: 'id' },
+            { type: 'string', key: 'first_name' },
+            { type: 'string', key: 'last_name' }
+          ]
+        }
+      ]
+
+      const { Response } = jest.requireActual('node-fetch')
+
+      mockedFetch
+        .mockReturnValueOnce(Promise.resolve(new Response(JSON.stringify([]))))
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/',
+        body: {
+          query: 'SELECT * FROM employees;',
+          config: {
+            extensions: [
+              'json1'
+            ],
+            schema: schemaBody
+          }
+        }
+      })
+
+      expect(JSON.parse(response.body)).toStrictEqual([])
       expect(response.statusCode).toBe(200)
     })
   })

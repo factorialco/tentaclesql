@@ -1,5 +1,5 @@
 import yargs from 'yargs/yargs'
-import queryTables from './src/queryTables'
+import executor from './src/executor'
 
 const argv = yargs(process.argv.slice(2)).options({
   query: { type: 'string', demandOption: true }
@@ -8,7 +8,7 @@ const argv = yargs(process.argv.slice(2)).options({
 if (argv.query) {
   const headers = { Cookie: `${process.env.COOKIE}` }
 
-  queryTables(
+  executor(
     argv.query,
     [],
     headers

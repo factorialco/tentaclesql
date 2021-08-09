@@ -103,3 +103,4 @@ The expected payload contains the following parameters:
   - **extensions**: Array of extensions to enable. Check
   https://github.com/nalgeon/sqlean to see all the supported extensions and how
   to use them.
+  - **schema**: Manual schema definition
