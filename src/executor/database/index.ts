@@ -32,7 +32,7 @@ function loadExtensions (
   })
 }
 
-export function createDatabase (extensions: Array<Extension>) {
+export function createDatabase (extensions: Array<Extension>): DatabaseType {
   // Empty name = temporary
   const db = new Database('', { verbose: (message) => { logger.debug(message) } })
   loadExtensions(db, extensions)
