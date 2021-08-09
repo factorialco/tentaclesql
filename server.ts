@@ -3,7 +3,7 @@ import build from './src/server'
 const start = async () => {
   const server = build()
   try {
-    await server.listen(process.env.PORT || 3000, '0.0.0.0')
+    await server.listen(process.env.PORT || 8080, '0.0.0.0')
   } catch (err) {
     await server.log.error(err)
 
