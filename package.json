@@ -3,13 +3,17 @@
   "version": "0.2.3",
   "description": "SQL engine from multiple sources",
   "dependencies": {
+    "@types/cli-table": "^0.3.0",
+    "@types/vorpal": "^1.12.2",
     "better-sqlite3": "^7.1.5",
+    "cli-table": "^0.3.6",
     "dd-trace": "^1.1.2",
     "fastify": "^3.14.2",
     "node-fetch": "^2.6.1",
     "pino": "^6.11.3",
     "pino-pretty": "^4.7.1",
     "sqlite-parser": "^1.0.1",
+    "vorpal": "^1.12.0",
     "yargs": "^16.2.0"
   },
   "devDependencies": {
