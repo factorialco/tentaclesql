@@ -5,7 +5,7 @@ import type { Database as DatabaseType } from 'better-sqlite3'
 
 type Extension = string
 
-const EXTENSIONS = {
+const EXTENSIONS: any = {
   crypto: 'crypto',
   json1: 'json1',
   math: 'math',
@@ -23,7 +23,7 @@ function loadExtensions (
   // https://github.com/nalgeon/sqlean
   const extensionBase = path.join(__dirname, '/sqlite_extensions/')
 
-  extensions.forEach(extension => {
+  extensions.forEach((extension: string) => {
     if (!EXTENSIONS[extension]) {
       throw Error(`${extension} extension not found!`)
     }

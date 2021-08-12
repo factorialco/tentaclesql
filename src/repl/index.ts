@@ -7,7 +7,7 @@ const startRpl = () => {
   const vorpal = new Vorpal()
   vorpal
     .command('sql <query>', 'Executes arbitrary sql.')
-    .action(async (args: any, callback: any) => {
+    .action(async (args: any) => {
       console.log('query args', args)
       const results = await executor(args.query, [], {})
 
@@ -21,7 +21,7 @@ const startRpl = () => {
         table.push(Object.values(result))
       })
 
-      callback(table.toString())
+      table.toString()
     })
 
   vorpal

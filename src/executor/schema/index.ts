@@ -28,7 +28,7 @@ export async function fetchSchema (
   return res.json()
 }
 
-const TYPES = { // Perdona Pau ;)
+const TYPES: any = { // Perdona Pau ;)
   bigint: 'BIGINT',
   date: 'DATE',
   number: 'INTEGER',

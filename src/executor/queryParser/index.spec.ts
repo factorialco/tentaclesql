@@ -1,7 +1,7 @@
 import { extractTables } from './index'
 
 test('extractTables', () => {
-  const subject = (sql) => {
+  const subject = (sql: string) => {
     return extractTables(sql)
   }
 
