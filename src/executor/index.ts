@@ -32,11 +32,14 @@ function getHost (): string {
   return (new URL(getSchemaUrl())).hostname
 }
 
-function mutateDataframe (df, fn) {
+function mutateDataframe (
+  df: Array<any>,
+  fn: (row: any, k: any) => void
+) {
   return df.forEach(row => { Object.keys(row).forEach(k => fn(row, k)) })
 }
 
-async function fetchTableData (tableDefinition: TableDefinition, headers) {
+async function fetchTableData (tableDefinition: TableDefinition, headers: any) {
   const res = await fetch(tableDefinition.url, { headers })
 
   if (!res.ok) {
@@ -52,9 +55,11 @@ async function populateTables (
   headers: any,
   schema: any
 ) {
-  const filteredTableDefinition = schema.filter(tableDefinition => usedTables.includes(tableDefinition.name))
+  const filteredTableDefinition = schema.filter((
+    tableDefinition: TableDefinition
+  ) => usedTables.includes(tableDefinition.name))
 
-  const promises = filteredTableDefinition.map(async (tableDefinition) => {
+  const promises = filteredTableDefinition.map(async (tableDefinition: TableDefinition) => {
     createTable(db, tableDefinition)
 
     const data = await fetchTableData(tableDefinition, headers)
@@ -72,7 +77,7 @@ async function populateTables (
   return Promise.all(promises)
 }
 
-function storeToDb (db: DatabaseType, tableDefinition: TableDefinition, data) {
+function storeToDb (db: DatabaseType, tableDefinition: TableDefinition, data: Array<any>) {
   const schema = tableDefinition.fields.map(field => `@${field.key}`).join(', ')
   const insert = db.prepare(`INSERT INTO ${tableDefinition.name} VALUES (${schema})`)
   for (const row of data) insert.run(row)

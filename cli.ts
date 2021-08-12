@@ -1,20 +1,33 @@
-import yargs from 'yargs/yargs'
+#!/usr/bin/env node
+
+import { Command } from 'commander'
 import executor from './src/executor'
+import startRpl from './src/repl'
 
-const argv = yargs(process.argv.slice(2)).options({
-  query: { type: 'string', demandOption: true }
-}).argv
+const program = new Command()
 
-if (argv.query) {
-  const headers = { Cookie: `${process.env.COOKIE}` }
+program
+  .command('query')
+  .argument('<sql>')
+  .action((sql: string) => {
+    const headers = { Cookie: `${process.env.COOKIE}` }
 
-  executor(
-    argv.query,
-    [],
-    headers
-  ).then(result => {
-    console.log(result)
-  }).catch(error => {
-    console.log(error)
+    executor(
+      sql,
+      [],
+      headers
+    ).then(result => {
+      console.log(result)
+    }).catch(error => {
+      console.log(error)
+    })
   })
-}
+
+program
+  .command('interactive')
+  .action(() => {
+    console.log('interactive mode')
+    startRpl()
+  })
+
+program.parse()
