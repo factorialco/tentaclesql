@@ -5,8 +5,9 @@
     "lib": ["esnext", "dom"],
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "strict": false, // TODO: Move to strict true when migrated
+    "strict": true,
     "strictNullChecks": true,
     "resolveJsonModule": true
-  }
+  },
+  "include": ["cli.ts"]
 }

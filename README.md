@@ -2,6 +2,18 @@
 
 Query your HTTP endpoints data using SQL
 
+## Install
+
+### Using docker
+
+`docker run -p 8080 -ti factorialco/tentaclesql`
+
+### As system command
+
+```bash
+npm i -g @factorialco/tentaclesql
+```
+
 ## Setup
 
 To be able to start TentacleSQL you need to provide a `SCHEMA_URL` environment
@@ -84,7 +96,7 @@ to denote relations between tables.
 - `table`: Target table of the foreign key
 - `foreign_key`: Referenced column by the foreign key
 
-## Usage
+## Usage HTTP API
 
 Once you have your tentaclesql server up and running you can use it by sending
 POST requests against `/`.
@@ -104,3 +116,17 @@ The expected payload contains the following parameters:
   https://github.com/nalgeon/sqlean to see all the supported extensions and how
   to use them.
   - **schema**: Manual schema definition
+
+## Usage CLI
+
+### Run interactive prompt
+
+```bash
+yarn cli interactive
+```
+
+### Execute queries
+
+```bash
+yarn cli interactive
+```

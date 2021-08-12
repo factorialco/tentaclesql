@@ -1,15 +1,19 @@
-import yargs from 'yargs/yargs'
-import { hideBin } from 'yargs/helpers'
+#!/usr/bin/env node
 
+import { Command } from 'commander'
 import executor from './src/executor'
 import startRpl from './src/repl'
 
-const argv = yargs(hideBin(process.argv))
-  .command(['query', 'q'], '', (argv) => {
+const program = new Command()
+
+program
+  .command('query')
+  .argument('<sql>')
+  .action((sql: string) => {
     const headers = { Cookie: `${process.env.COOKIE}` }
 
     executor(
-      argv.query,
+      sql,
       [],
       headers
     ).then(result => {
@@ -18,8 +22,12 @@ const argv = yargs(hideBin(process.argv))
       console.log(error)
     })
   })
-  .command(['interactive', 'i'], '', () => {
+
+program
+  .command('interactive')
+  .action(() => {
     console.log('interactive mode')
     startRpl()
   })
-  .argv
+
+program.parse()
