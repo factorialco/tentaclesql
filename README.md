@@ -123,10 +123,14 @@ The expected payload contains the following parameters:
 
 ```bash
 yarn cli interactive
+# or installed global
+tentaclesql interactive
 ```
 
 ### Execute queries
 
 ```bash
-yarn cli interactive
+yarn cli query "SELECT 1;"
+# or installed global
+tentaclesql query "SELECT 1;"
 ```
