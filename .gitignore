@@ -102,3 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Compiled files by running `yarn tsc`
+src/**/*.js

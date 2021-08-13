@@ -16,16 +16,21 @@ npm i -g @factorialco/tentaclesql
 
 ## Setup
 
-To be able to start TentacleSQL you need to provide a `SCHEMA_URL` environment
-variable specifying the route to retrieve the schema from.
+To be able to start TentacleSQL you need to provide even `SCHEMA_URL` or
+`SCHEMA_FILE` environment variable specifying the route to retrieve the schema
+from.
 
-Example:
+Alternativelly you can provide your own schema into same POST request you run
+the query.
+
+Examples:
 
 ```
 SCHEMA_URL='https://example.com/api/schema'
+SCHEMA_FILE='example.yaml' # Note that should be placed into `schemas` folder
 ```
 
-This endpoint need to respond with an array of all the table definitions
+This schmema stucture is an array of all the table definitions
 available in your schema. Something like:
 
 ```json
@@ -71,14 +76,18 @@ available in your schema. Something like:
 ]
 ```
 
-### Schema definition
+To see yaml example check `schemas/example.yaml`.
 
-The schema endpoint needs to respond with an array of table definitions:
+### Schema definition API
+
+The schema definition needs to respond with an array of table definitions:
 
 **Table:**
 
 - `name`: Name of the table
 - `url`: URL to retrieve the data from
+- `autodiscover`: If you want to autodiscover fields from url response
+- `result_key`: Which key should be readed for array of results
 - `fields`: List of fields / foreign keys of this table
 
 Each table will have an array of fields that can be raw fields or foreign key
@@ -118,6 +127,15 @@ The expected payload contains the following parameters:
   - **schema**: Manual schema definition
 
 ## Usage CLI
+
+Note that you must configure your schema first. You can pass an environment
+variable:
+
+Example
+
+```bash
+SCHEMA_FILE=example.yaml tentaclesql interactive
+```
 
 ### Run interactive prompt
 
