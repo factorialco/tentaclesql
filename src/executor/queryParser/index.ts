@@ -15,12 +15,12 @@ function validateQuery (ast: any) {
   if (!['select', 'compound'].includes(ast.statement[0].variant)) throw new Error('Only SELECT queries are supported')
 }
 
-function parse (sql: string) {
+export function parseSql (sql: string) {
   return sqliteParser(sql)
 }
 
 export function extractTables (sql: string) {
-  const ast = parse(sql)
+  const ast = parseSql(sql)
 
   validateQuery(ast)
 
