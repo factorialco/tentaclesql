@@ -1,8 +1,9 @@
-import { extractTables } from './index'
+import { extractTables, parseSql } from './index'
 
 test('extractTables', () => {
   const subject = (sql: string) => {
-    return extractTables(sql)
+    const ast = parseSql(sql)
+    return extractTables(ast)
   }
 
   expect(subject('SELECT goal_config_id, name FROM goals_config WHERE goal_config_id > (SELECT COUNT(*) - 100 FROM employee) AND 1=1')).toEqual([

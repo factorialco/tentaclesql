@@ -19,9 +19,7 @@ export function parseSql (sql: string) {
   return sqliteParser(sql)
 }
 
-export function extractTables (sql: string) {
-  const ast = parseSql(sql)
-
+export function extractTables (ast: any) {
   validateQuery(ast)
 
   const tables: Array<string> = []

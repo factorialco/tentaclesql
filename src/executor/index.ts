@@ -112,14 +112,14 @@ async function executor (
 
   const db = createDatabase(config.extensions)
 
-  const usedTables = extractTables(sql)
+  const ast = parseSql(sql)
+  const usedTables = extractTables(ast)
 
   if (usedTables.length > 0) {
     delete headers['content-length']
 
     const schema: Schema = await fetchSchema(headers, config.schema)
 
-    const ast = parseSql(sql)
     await populateTables(
       db,
       usedTables, {
