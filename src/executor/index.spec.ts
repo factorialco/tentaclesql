@@ -1,6 +1,7 @@
 import fetch from 'node-fetch'
 import executor from './index'
 import { version } from '../../package.json'
+import { parseSql } from './queryParser'
 
 jest.mock('node-fetch')
 
@@ -56,11 +57,12 @@ test('executor', async () => {
   const sql = 'SELECT employees.id + goal_configs.id as value FROM goal_configs JOIN employees ON (employees.id + ?) == goal_configs.id'
 
   const result = await executor(sql, [5], headers)
+  const ast = JSON.stringify(parseSql(sql))
 
   expect(mockedFetch).toHaveBeenCalledTimes(3)
   expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/schema', { headers })
-  expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/tables/goal_configs', { headers })
-  expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/tables/employees', { headers })
+  expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/tables/goal_configs', { headers: { ...headers, 'x-tentacle-query-ast': ast } })
+  expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/tables/employees', { headers: { ...headers, 'x-tentacle-query-ast': ast } })
   expect(result).toEqual([{ value: 25 }])
 })
 

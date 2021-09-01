@@ -3,7 +3,7 @@ import { version } from '../../package.json'
 
 import type { Database as DatabaseType } from 'better-sqlite3'
 
-import { extractTables } from './queryParser'
+import { extractTables, parseSql } from './queryParser'
 import { createDatabase } from './database'
 import {
   fetchSchema,
@@ -112,9 +112,12 @@ async function executor (
 
   const db = createDatabase(config.extensions)
 
-  const usedTables = extractTables(sql)
+  const ast = parseSql(sql)
+  const usedTables = extractTables(ast)
+
   if (usedTables.length > 0) {
     delete headers['content-length']
+
     const schema: Schema = await fetchSchema(headers, config.schema)
 
     await populateTables(
@@ -122,7 +125,8 @@ async function executor (
       usedTables, {
         ...headers,
         host: getHost(),
-        'user-agent': `tentaclesql/${version}`
+        'user-agent': `tentaclesql/${version}`,
+        'x-tentacle-query-ast': JSON.stringify(ast)
       },
       schema
     )
