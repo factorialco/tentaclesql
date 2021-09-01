@@ -61,8 +61,8 @@ test('executor', async () => {
 
   expect(mockedFetch).toHaveBeenCalledTimes(3)
   expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/schema', { headers })
-  expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/tables/goal_configs', { headers: {...headers, 'x-tentacle-query-ast': ast }})
-  expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/tables/employees', { headers: { ...headers, 'x-tentacle-query-ast': ast }})
+  expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/tables/goal_configs', { headers: {...headers, 'x-tentacle-query-ast': ast } })
+  expect(mockedFetch).toHaveBeenCalledWith('https://api.example.com/tables/employees', { headers: { ...headers, 'x-tentacle-query-ast': ast } })
   expect(result).toEqual([{ value: 25 }])
 })
 
