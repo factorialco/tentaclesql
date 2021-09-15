@@ -39,8 +39,15 @@ function mutateDataframe (
   return df.forEach(row => { Object.keys(row).forEach(k => fn(row, k)) })
 }
 
-async function fetchTableData (tableDefinition: TableDefinition, headers: any) {
-  const res = await fetch(tableDefinition.url, { headers })
+async function fetchTableData (tableDefinition: TableDefinition, headers: any, queryAst: any) {
+  const res = await fetch(tableDefinition.url, {
+    headers: headers,
+    method: 'POST',
+    body: JSON.stringify({
+      query_ast: queryAst
+    })
+  }
+  )
 
   if (!res.ok) {
     return Promise.reject(new Error(`Error with the request. Status code: ${res.status}`))
@@ -53,7 +60,8 @@ async function populateTables (
   db: DatabaseType,
   usedTables: Array<string>,
   headers: any,
-  schema: any
+  schema: any,
+  queryAst: any
 ) {
   const filteredTableDefinition = schema.filter((
     tableDefinition: TableDefinition
@@ -62,7 +70,7 @@ async function populateTables (
   const promises = filteredTableDefinition.map(async (tableDefinition: TableDefinition) => {
     createTable(db, tableDefinition)
 
-    const data = await fetchTableData(tableDefinition, headers)
+    const data = await fetchTableData(tableDefinition, headers, queryAst)
 
     if (data.length === 0) return
 
@@ -125,10 +133,10 @@ async function executor (
       usedTables, {
         ...headers,
         host: getHost(),
-        'user-agent': `tentaclesql/${version}`,
-        'x-tentacle-query-ast': JSON.stringify(ast)
+        'user-agent': `tentaclesql/${version}`
       },
-      schema
+      schema,
+      ast
     )
   }
 
