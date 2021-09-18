@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 import { version } from '../../package.json'
 
-import { extractTables } from './queryParser'
+import { extractTables, parseSql } from './queryParser'
 import Database from './database/better-sqlite-adapter'
 import IDatabaseAdapter from './database/IDatabaseAdapter'
 import flattenObject from './utils/flattenObject'
@@ -149,7 +149,8 @@ async function executor (
       db,
       usedTables,
       headers,
-      schema
+      schema,
+      ast
     )
   }
 
