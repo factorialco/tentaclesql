@@ -9,7 +9,6 @@
   "dependencies": {
     "better-sqlite3": "^7.1.5",
     "cli-table": "^0.3.6",
-    "commander": "^8.1.0",
     "dd-trace": "^1.1.2",
     "fastify": "^3.14.2",
     "node-fetch": "^2.6.1",
@@ -48,6 +47,7 @@
     "cli": "LOG_LEVEL='debug' esno cli.ts",
     "lint": "eslint . --ext .ts",
     "start": "esno server.ts",
+    "start:cli": "esno cli.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "watch": "yarn build -- --watch"

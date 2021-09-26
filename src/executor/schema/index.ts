@@ -1,14 +1,11 @@
 import fetch from 'node-fetch'
+import YAML from 'yaml'
+import { readFileSync } from 'fs'
+import path from 'path'
 
 type FieldDefinition = {
   type: string,
   key: string,
-}
-
-type TableDefinition = {
-  name: string,
-  url: string,
-  fields: Array<FieldDefinition>
 }
 
 export async function fetchSchema (
@@ -19,13 +16,27 @@ export async function fetchSchema (
     return schema
   }
 
-  const res = await fetch(getSchemaUrl(), { headers })
+  const schemaFile = getSchemaFile()
 
-  if (!res.ok) {
-    return Promise.reject(new Error(`Error with the request. Status code: ${res.status}`))
+  if (schemaFile) {
+    const filePath = path.join(__dirname, '..', '..', '..', 'schemas', schemaFile)
+    const file = readFileSync(filePath, 'utf8')
+    const res = YAML.parse(file)
+
+    return res.tables
   }
 
-  return res.json()
+  const schemaUrl = getSchemaUrl()
+
+  if (schemaUrl) {
+    const res = await fetch(schemaUrl, { headers })
+
+    if (!res.ok) {
+      return Promise.reject(new Error(`Error with the request. Status code: ${res.status}`))
+    }
+
+    return res.json()
+  }
 }
 
 const TYPES: any = { // Perdona Pau ;)
@@ -38,20 +49,20 @@ const TYPES: any = { // Perdona Pau ;)
   boolean: 'BOOLEAN'
 }
 
-export function parseSchema (tableDefinition: TableDefinition): Array<string> {
-  return tableDefinition.fields.map(field => {
+export function parseSchema (fields: Array<FieldDefinition>): Array<string> {
+  return fields.map(field => {
     const type = TYPES[field.type]
 
-    if (!type) throw new Error(`Invalid field type ${field.type}`)
+    if (!type) return `${field.key}`
 
     return `${field.key} ${type}`
   })
 }
 
-export function getSchemaUrl (): string {
-  if (!process.env.SCHEMA_URL) {
-    throw new Error('SCHEMA_URL environment variable is mandatory')
-  }
-
+export function getSchemaUrl (): string | undefined {
   return process.env.SCHEMA_URL
+}
+
+export function getSchemaFile (): string | undefined {
+  return process.env.SCHEMA_FILE
 }
