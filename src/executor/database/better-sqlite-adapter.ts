@@ -15,20 +15,27 @@ const EXTENSIONS: any = {
 
 class BetterSqliteAdapter implements IDatabaseAdapter {
   db: any
+  extensions: Array<string>
 
   constructor (extensions: Array<string>) {
-    this.init(extensions)
+    this.extensions = extensions
+    this.init()
   }
 
-  async init (extensions: Array<string>) {
-    if (typeof window !== 'undefined') {
+  async init () {
+    const isTest = process.env.NODE_ENV === 'test'
+
+    if (!isTest && typeof window !== 'undefined') {
       throw Error('You must provide a compatible DatabaseAdapter')
     }
 
     const databaseConst = await import('better-sqlite3')
+
     const Database = databaseConst.default
-    this.db = new Database('', { verbose: (message) => { logger.debug(message) } })
-    this.loadExtensions(extensions)
+    this.db = new Database('', {
+      verbose: (message) => { logger.debug(message) }
+    })
+    this.loadExtensions(this.extensions)
   }
 
   loadExtensions (extensions: Array<string>) {
@@ -57,7 +64,7 @@ class BetterSqliteAdapter implements IDatabaseAdapter {
     this.db.prepare(query).run()
   }
 
-  runQuery (sql: string, parameters: Array<any>) {
+  async runQuery (sql: string, parameters: Array<any>) {
     const stmt = this.db.prepare(sql)
 
     return stmt.all(parameters)

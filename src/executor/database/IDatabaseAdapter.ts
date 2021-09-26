@@ -1,4 +1,5 @@
 export default interface IDatabaseAdapter {
+  init: () => Promise<void>,
   storeToDb: (
     tableDefinition: any,
     data: Array<any>
@@ -10,5 +11,5 @@ export default interface IDatabaseAdapter {
   runQuery (
     sql: string,
     parameters: Array<any>
-  ) : Array<any>
+  ) : Promise<Array<any>>
 }

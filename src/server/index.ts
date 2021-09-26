@@ -26,20 +26,22 @@ const build = () => {
         .send({ errors: 'Invalid SQL query' })
     }
 
-    return executor(
-      request.body.query,
-      request.body.parameters || [],
-      request.headers,
-      request.body.config
-    ).then(result => {
+    try {
+      const result = await executor(
+        request.body.query,
+        request.body.parameters || [],
+        request.headers,
+        request.body.config
+      )
+
       server.log.info(result)
 
       reply.send(result)
-    }).catch(error => {
+    } catch (error) {
       server.log.error(error)
 
       reply.send(error)
-    })
+    }
   })
 
   // Health check route

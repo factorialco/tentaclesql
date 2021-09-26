@@ -8,12 +8,6 @@ type FieldDefinition = {
   key: string,
 }
 
-type TableDefinition = {
-  name: string,
-  url: string,
-  fields: Array<FieldDefinition>
-}
-
 export async function fetchSchema (
   headers: any,
   schema: any

@@ -47,10 +47,15 @@ function mutateDataframe (
   return df.forEach(row => { Object.keys(row).forEach(k => fn(row, k)) })
 }
 
-async function fetchTableData (tableDefinition: TableDefinition, headers: any, queryAst: any) {
+async function fetchTableData (
+  tableDefinition: TableDefinition,
+  headers: any,
+  queryAst: any,
+  method: 'POST' | 'GET' = 'POST'
+) {
   const res = await fetch(tableDefinition.url, {
     headers: headers,
-    method: 'POST',
+    method: method,
     body: JSON.stringify({
       query_ast: queryAst
     })
@@ -133,6 +138,9 @@ async function executor (
   })
 
   const db: IDatabaseAdapter = database || new Database(config.extensions)
+  if (!database) {
+    await db.init()
+  }
 
   const ast = parseSql(sql)
   const usedTables = extractTables(ast)
