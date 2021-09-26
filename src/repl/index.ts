@@ -39,7 +39,6 @@ const startRpl = () => {
 
   if (process.argv.includes('interactive')) {
     vorpal
-      // .parse(process.argv.filter(arg => arg !== 'interactive'))
       .show()
   } else {
     vorpal.delimiter('')

@@ -30,7 +30,7 @@ SCHEMA_URL='https://example.com/api/schema'
 SCHEMA_FILE='example.yaml' # Note that should be placed into `schemas` folder
 ```
 
-This schmema stucture is an array of all the table definitions
+This schema stucture is an array of all the table definitions
 available in your schema. Something like:
 
 ```json
