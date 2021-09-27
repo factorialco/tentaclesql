@@ -1,0 +1,23 @@
+name: Build and publish to npm
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  push_to_npm:
+    name: Publish package to npm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: NPM or Yarn install with caching
+        uses: bahmutov/npm-install@v1.1.0
+
+      - run: yarn build
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
