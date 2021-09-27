@@ -1,6 +1,6 @@
 {
   "name": "@factorialco/tentaclesql",
-  "version": "1.0.0-beta",
+  "version": "1.0.0-beta.1",
   "description": "SQL engine from multiple sources",
   "bin": {
     "tentaclesql": "dist/cli.js"
