@@ -17,6 +17,7 @@ const schemaBody = [
   {
     name: 'employees',
     url: 'https://api.example.com/tables/employees',
+    astPassthrough: true,
     fields: [
       { type: 'number', key: 'id' },
       { type: 'string', key: 'first_name' },
@@ -26,6 +27,7 @@ const schemaBody = [
   {
     name: 'goal_configs',
     url: 'https://api.example.com/tables/goal_configs',
+    astPassthrough: true,
     fields: [
       { type: 'number', key: 'id' },
       { type: 'string', key: 'title' }
