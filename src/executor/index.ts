@@ -1,4 +1,3 @@
-import fetch from 'node-fetch'
 import { version } from '../../package.json'
 
 import { extractTables, parseSql } from './queryParser'
@@ -110,7 +109,11 @@ async function executor (
     extensions: Array<Extension>,
     schema: Array<TableDefinition>
   } = DEFAULT_CONFIG,
-  database?: IDatabaseAdapter
+  database?: IDatabaseAdapter,
+  fetcher: (
+      tableDefinition: any,
+      headers: any, queryAst: any
+  ) => Promise<any> = dataFetcher
 ) {
   logger.info({
     sql: sql,
@@ -139,7 +142,8 @@ async function executor (
       usedTables,
       headers,
       schema,
-      ast
+      ast,
+      fetcher
     )
   }
 

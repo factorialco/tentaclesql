@@ -1,4 +1,6 @@
-export default async function fetchTableData (
+import fetch from 'node-fetch'
+
+export default async function dataFetcher (
   tableDefinition: any,
   headers: any,
   queryAst: any
@@ -22,4 +24,3 @@ export default async function fetchTableData (
 
   return res.json()
 }
-
