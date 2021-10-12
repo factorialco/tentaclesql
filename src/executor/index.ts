@@ -11,6 +11,7 @@ import {
   getSchemaUrl
 } from './schema'
 import logger from '../logger'
+import dataFetcher from './dataFetcher'
 
 export type Extension = string
 
@@ -23,6 +24,7 @@ type TableDefinition = {
   name: string,
   url: string,
   autodiscover?: boolean,
+  astPassthrough?: boolean,
   resultKey?: string,
   fields: Array<FieldDefinition>
 }
@@ -47,34 +49,13 @@ function mutateDataframe (
   return df.forEach(row => { Object.keys(row).forEach(k => fn(row, k)) })
 }
 
-async function fetchTableData (
-  tableDefinition: TableDefinition,
-  headers: any,
-  queryAst: any,
-  method: 'POST' | 'GET' = 'POST'
-) {
-  const res = await fetch(tableDefinition.url, {
-    headers: headers,
-    method: method,
-    body: JSON.stringify({
-      query_ast: queryAst
-    })
-  }
-  )
-
-  if (!res.ok) {
-    return Promise.reject(new Error(`Error with the request. Status code: ${res.status}`))
-  }
-
-  return res.json()
-}
-
 async function populateTables (
   db: IDatabaseAdapter,
   usedTables: Array<string>,
   headers: any,
   schema: any,
-  queryAst: any
+  queryAst: any,
+  fetcher: any = dataFetcher
 ) {
   const filteredTableDefinition = schema.filter((
     tableDefinition: TableDefinition
@@ -87,7 +68,7 @@ async function populateTables (
       db.createTable(tableDefinition, schemas)
     }
 
-    const data = await fetchTableData(tableDefinition, headers, queryAst)
+    const data = await fetcher(tableDefinition, headers, queryAst)
 
     const resultKey = tableDefinition.resultKey
     const dataPointer = resultKey ? data[resultKey] : data
