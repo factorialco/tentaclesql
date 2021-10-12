@@ -87,6 +87,8 @@ The schema definition needs to respond with an array of table definitions:
 - `name`: Name of the table
 - `url`: URL to retrieve the data from
 - `autodiscover`: If you want to autodiscover fields from url response
+- `astPassthrough`: This will pass ast to fetched tables to apply optimizations
+  (NOTE: It will perform POST requests instead of GET)
 - `result_key`: Which key should be readed for array of results
 - `fields`: List of fields / foreign keys of this table
 
