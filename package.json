@@ -55,7 +55,7 @@
     "typescript": "^4.4.4"
   },
   "scripts": {
-    "build": "rimraf dist && tsup server.ts src/executor/index.ts cli.ts --format cjs,esm --dts",
+    "build": "rimraf dist && rimraf '!(node_modules)/**/*.js' && tsup server.ts src/executor/index.ts cli.ts --format cjs,esm --dts",
     "cli": "LOG_LEVEL='debug' esno cli.ts",
     "lint": "eslint . --ext .ts",
     "start": "esno server.ts",
