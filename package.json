@@ -40,7 +40,20 @@
     "jest": "^26.6.3",
     "rimraf": "^3.0.2",
     "tsup": "^4.9.1",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4",
+    "@commitlint/cli": "latest",
+    "@commitlint/config-conventional": "latest",
+    "ci-publish": "latest",
+    "conventional-github-releaser": "latest",
+    "finepack": "latest",
+    "git-authors-cli": "latest",
+    "lint-staged": "latest",
+    "npm-check-updates": "latest",
+    "nyc": "latest",
+    "prettier-standard": "latest",
+    "simple-git-hooks": "latest",
+    "standard": "latest",
+    "standard-markdown": "latest"
   },
   "scripts": {
     "build": "rimraf dist && tsup server.ts src/executor/index.ts cli.ts --format cjs,esm --dts",
@@ -50,9 +63,20 @@
     "start:cli": "esno cli.ts",
     "test": "jest",
     "test:watch": "jest --watch",
-    "watch": "yarn build -- --watch"
+    "watch": "yarn build -- --watch",
+    "contributors": "(git-authors-cli && finepack && git add package.json && git commit -m 'build: contributors' --no-verify) || true",
+    "postrelease": "npm run release:tags && npm run release:github && (ci-publish || npm publish --access=public)",
+    "prerelease": "npm run update:check && npm run contributors",
+    "release:github": "conventional-github-releaser -p angular",
+    "release:tags": "git push --follow-tags origin HEAD:master",
+    "release": "standard-version -a",
+    "update:check": "ncu -- --error-level 2",
+    "update": "ncu -u"
   },
-  "author": "Factorial <admin@factorial.co>",
+  "author": {
+    "name": "Factorial",
+    "email": "admin@factorial.co"
+  },
   "license": "ISC",
   "repository": {
     "type": "git",
@@ -66,5 +90,25 @@
   "bugs": {
     "url": "https://github.com/factorialco/tentaclesql/issues"
   },
-  "homepage": "https://github.com/factorialco/tentaclesql#readme"
+  "homepage": "https://github.com/factorialco/tentaclesql#readme",
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "lint-staged": {
+    "package.json": [
+      "finepack"
+    ],
+    "*.js,!*.min.js,": [
+      "prettier-standard"
+    ],
+    "*.md": [
+      "standard-markdown"
+    ]
+  },
+  "simple-git-hooks": {
+    "commit-msg": "npx commitlint --edit",
+    "pre-commit": "npx lint-staged"
+  }
 }
