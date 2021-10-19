@@ -7,52 +7,75 @@
   },
   "main": "dist/src/executor/index.js",
   "dependencies": {
-    "better-sqlite3": "^7.1.5",
+    "better-sqlite3": "^7.4.3",
     "cli-table": "^0.3.6",
-    "dd-trace": "^1.1.2",
-    "fastify": "^3.14.2",
-    "node-fetch": "^2.6.1",
-    "pino": "^6.11.3",
-    "pino-pretty": "^4.7.1",
+    "dd-trace": "^1.5.0",
+    "fastify": "^3.22.0",
+    "node-fetch": "^2.6.2",
+    "pino": "^7.0.2",
+    "pino-pretty": "^7.1.0",
     "sqlite-parser": "^1.0.1",
     "vorpal": "^1.12.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.13.16",
-    "@babel/preset-env": "^7.13.15",
-    "@babel/preset-typescript": "^7.13.0",
-    "@types/better-sqlite3": "^5.4.1",
+    "@babel/core": "^7.15.8",
+    "@babel/preset-env": "^7.15.8",
+    "@babel/preset-typescript": "^7.15.0",
+    "@commitlint/cli": "latest",
+    "@commitlint/config-conventional": "latest",
+    "@types/better-sqlite3": "^7.4.0",
     "@types/cli-table": "^0.3.0",
-    "@types/jest": "^26.0.23",
-    "@types/node": "^14.14.41",
-    "@types/node-fetch": "^2.5.10",
-    "@types/pino": "^6.3.11",
+    "@types/jest": "^27.0.2",
+    "@types/node": "^16.11.1",
+    "@types/node-fetch": "^2.5.12",
     "@types/vorpal": "^1.12.2",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
+    "ci-publish": "latest",
+    "conventional-github-releaser": "latest",
     "eslint": "^7.25.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jest": "^24.3.6",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.3.1",
-    "esno": "^0.5.0",
-    "jest": "^26.6.3",
+    "eslint-plugin-promise": "^5.1.0",
+    "esno": "^0.10.1",
+    "finepack": "latest",
+    "git-authors-cli": "latest",
+    "jest": "^27.0.2",
+    "lint-staged": "latest",
+    "prettier-standard": "latest",
     "rimraf": "^3.0.2",
-    "tsup": "^4.9.1",
-    "typescript": "^4.2.4"
+    "simple-git-hooks": "latest",
+    "standard": "latest",
+    "standard-markdown": "latest",
+    "ts-jest": "^27.0.2",
+    "tsup": "^5.4.1",
+    "typescript": "^4.4.4"
   },
   "scripts": {
-    "build": "rimraf dist && tsup server.ts src/executor/index.ts cli.ts --format cjs,esm --dts",
+    "build": "rimraf dist && rimraf '!(node_modules)/**/*.js' && tsup server.ts src/executor/index.ts cli.ts --format cjs,esm --dts",
     "cli": "LOG_LEVEL='debug' esno cli.ts",
     "lint": "eslint . --ext .ts",
     "start": "esno server.ts",
     "start:cli": "esno cli.ts",
+    "coverage": "yarn run test --collect-coverage",
     "test": "jest",
     "test:watch": "jest --watch",
-    "watch": "yarn build -- --watch"
+    "watch": "yarn build -- --watch",
+    "contributors": "(git-authors-cli && finepack && git add package.json && git commit -m 'build: contributors' --no-verify) || true",
+    "postrelease": "yarn run release:tags && yarn run release:github && (ci-publish || yarn publish --access=public)",
+    "prerelease": "ya run update:check && yarn run contributors",
+    "release:github": "conventional-github-releaser -p angular",
+    "release:tags": "git push --follow-tags origin HEAD:master",
+    "release": "standard-version -a",
+    "update:check": "ncu -- --error-level 2",
+    "update": "ncu -u"
   },
-  "author": "Factorial <admin@factorial.co>",
+  "author": {
+    "name": "Factorial",
+    "email": "admin@factorial.co"
+  },
   "license": "ISC",
   "repository": {
     "type": "git",
@@ -66,5 +89,30 @@
   "bugs": {
     "url": "https://github.com/factorialco/tentaclesql/issues"
   },
-  "homepage": "https://github.com/factorialco/tentaclesql#readme"
+  "homepage": "https://github.com/factorialco/tentaclesql#readme",
+  "jest": {
+    "testMatch": [
+      "**/?(*.)+(spec|test).[t]s?(x)"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "lint-staged": {
+    "package.json": [
+      "finepack"
+    ],
+    "*.js,!*.min.js,": [
+      "prettier-standard"
+    ],
+    "*.md": [
+      "standard-markdown"
+    ]
+  },
+  "simple-git-hooks": {
+    "commit-msg": "npx commitlint --edit",
+    "pre-commit": "npx lint-staged"
+  }
 }

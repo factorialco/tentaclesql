@@ -52,7 +52,7 @@ async function fetchTableData (
   headers: any,
   queryAst: any,
   method: 'POST' | 'GET' = 'POST'
-) {
+): Promise<any> {
   const res = await fetch(tableDefinition.url, {
     headers: headers,
     method: method,
