@@ -8,8 +8,8 @@
     "tentaclesql": "dist/cli.js"
   },
   "author": {
-    "email": "admin@factorial.co",
-    "name": "Factorial"
+    "name": "Factorial",
+    "email": "admin@factorial.co"
   },
   "contributors": [
     {
@@ -105,9 +105,9 @@
     "watch": "yarn build -- --watch",
     "contributors": "(git-authors-cli && finepack && git add package.json && git commit -m 'build: contributors' --no-verify) || true",
     "postrelease": "yarn run release:tags && yarn run release:github && (ci-publish || yarn publish --access=public)",
-    "prerelease": "ya run update:check && yarn run contributors",
+    "prerelease": "yarn run update:check && yarn run contributors",
     "release:github": "conventional-github-releaser -p angular",
-    "release:tags": "git push --follow-tags origin HEAD:master",
+    "release:tags": "git push --follow-tags origin HEAD:main",
     "release": "standard-version -a",
     "update:check": "ncu -- --error-level 2",
     "update": "ncu -u"
