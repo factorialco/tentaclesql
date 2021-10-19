@@ -1,11 +1,12 @@
 {
   "name": "@factorialco/tentaclesql",
-  "version": "1.0.0-beta.1",
   "description": "SQL engine from multiple sources",
+  "homepage": "https://github.com/factorialco/tentaclesql#readme",
+  "version": "1.0.0",
+  "main": "dist/src/executor/index.js",
   "bin": {
     "tentaclesql": "dist/cli.js"
   },
-  "main": "dist/src/executor/index.js",
   "author": {
     "email": "admin@factorial.co",
     "name": "Factorial"
@@ -111,7 +112,6 @@
     "update:check": "ncu -- --error-level 2",
     "update": "ncu -u"
   },
-  "homepage": "https://github.com/factorialco/tentaclesql#readme",
   "jest": {
     "testMatch": [
       "**/?(*.)+(spec|test).[t]s?(x)"
