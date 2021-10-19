@@ -6,6 +6,44 @@
     "tentaclesql": "dist/cli.js"
   },
   "main": "dist/src/executor/index.js",
+  "author": {
+    "email": "admin@factorial.co",
+    "name": "Factorial"
+  },
+  "contributors": [
+    {
+      "name": "Genar Trias Ortiz",
+      "email": "genar@acs.li"
+    },
+    {
+      "name": "Omar Sotillo Franco",
+      "email": "omarsotillofranco@gmail.com"
+    },
+    {
+      "name": "Ferran Basora",
+      "email": "fcsonline@gmail.com"
+    },
+    {
+      "name": "Omar Sotillo",
+      "email": "omar@factorial.co"
+    },
+    {
+      "name": "Pau Ramon Revilla",
+      "email": "masylum@gmail.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/factorialco/tentaclesql.git"
+  },
+  "bugs": {
+    "url": "https://github.com/factorialco/tentaclesql/issues"
+  },
+  "keywords": [
+    "cli",
+    "rest-api",
+    "sqlite"
+  ],
   "dependencies": {
     "better-sqlite3": "^7.4.3",
     "cli-table": "^0.3.6",
@@ -49,6 +87,7 @@
     "simple-git-hooks": "latest",
     "standard": "latest",
     "standard-markdown": "latest",
+    "standard-version": "^9.3.2",
     "ts-jest": "^27.0.2",
     "tsup": "^5.4.1",
     "typescript": "^4.4.4"
@@ -71,23 +110,6 @@
     "release": "standard-version -a",
     "update:check": "ncu -- --error-level 2",
     "update": "ncu -u"
-  },
-  "author": {
-    "name": "Factorial",
-    "email": "admin@factorial.co"
-  },
-  "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/factorialco/tentaclesql.git"
-  },
-  "keywords": [
-    "sqlite",
-    "rest-api",
-    "cli"
-  ],
-  "bugs": {
-    "url": "https://github.com/factorialco/tentaclesql/issues"
   },
   "homepage": "https://github.com/factorialco/tentaclesql#readme",
   "jest": {
