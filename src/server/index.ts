@@ -37,7 +37,7 @@ const build = () => {
       server.log.info(result)
 
       reply.send(result)
-    } catch (error) {
+    } catch (error: any) {
       server.log.error(error)
 
       if (error?.name === 'SyntaxError') {
