@@ -40,6 +40,10 @@ const build = () => {
     } catch (error) {
       server.log.error(error)
 
+      if (error?.name === 'SyntaxError') {
+        return reply.code(422).send(error)
+      }
+
       reply.send(error)
     }
   })

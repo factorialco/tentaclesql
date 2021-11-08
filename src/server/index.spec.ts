@@ -61,6 +61,22 @@ describe('server', () => {
       expect(response.statusCode).toBe(200)
     })
 
+    it('proper handles invalid SQL', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/',
+        body: {
+          query: 'SELECasdf',
+          config: {
+            extensions: [],
+            schema: []
+          }
+        }
+      })
+
+      expect(response.statusCode).toBe(422)
+    })
+
     it('accepts manual schema into the same request', async () => {
       const schemaBody = [
         {
