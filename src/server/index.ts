@@ -12,7 +12,6 @@ interface Body {
   }
 }
 
-
 const build = () => {
   const server = fastify({ logger: logger })
   server.setErrorHandler(function (error: any, request: FastifyRequest, reply: FastifyReply) {
