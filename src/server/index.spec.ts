@@ -74,7 +74,7 @@ describe('server', () => {
         }
       })
 
-      expect(response.statusCode).toBe(422)
+      expect(response.statusCode).toBe(400)
     })
 
     it('accepts manual schema into the same request', async () => {

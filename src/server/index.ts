@@ -1,4 +1,4 @@
-import fastify from 'fastify'
+import fastify, { FastifyRequest, FastifyReply } from 'fastify'
 import executor from '../executor'
 import type { Extension } from '../executor'
 import logger from '../logger'
@@ -12,8 +12,18 @@ interface Body {
   }
 }
 
+
 const build = () => {
   const server = fastify({ logger: logger })
+  server.setErrorHandler(function (error: any, request: FastifyRequest, reply: FastifyReply) {
+    this.log.error(error)
+
+    if (error?.name === 'SyntaxError') {
+      reply.code(400)
+    }
+
+    reply.send(error)
+  })
 
   // SQL Query endpoint
   server.post<{ Body: Body }>('/', async (request, reply) => {
@@ -26,26 +36,16 @@ const build = () => {
         .send({ errors: 'Invalid SQL query' })
     }
 
-    try {
-      const result = await executor(
-        request.body.query,
-        request.body.parameters || [],
-        request.headers,
-        request.body.config
-      )
+    const result = await executor(
+      request.body.query,
+      request.body.parameters || [],
+      request.headers,
+      request.body.config
+    )
 
-      server.log.info(result)
+    server.log.info(result)
 
-      reply.send(result)
-    } catch (error: any) {
-      server.log.error(error)
-
-      if (error?.name === 'SyntaxError') {
-        return reply.code(422).send(error)
-      }
-
-      reply.send(error)
-    }
+    reply.send(result)
   })
 
   // Health check route
