@@ -84,6 +84,7 @@
     "git-authors-cli": "latest",
     "jest": "^27.0.2",
     "lint-staged": "latest",
+    "ncu": "^0.2.1",
     "prettier-standard": "latest",
     "rimraf": "^3.0.2",
     "simple-git-hooks": "latest",
