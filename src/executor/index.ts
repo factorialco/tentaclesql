@@ -69,6 +69,30 @@ async function fetchTableData (
   return res.json()
 }
 
+async function fetchTablesData (
+tableDefinitions: Array<TableDefinition>,
+  headers: any,
+  queryAst: any,
+  method: 'POST' | 'GET' = 'POST'
+): Promise<any> {
+  const res = await fetch(
+    'https://api.ali-dev.factorialhr.com/business_intelligence/tables', {
+    headers: headers,
+    method: method,
+    body: JSON.stringify({
+      query_ast: queryAst,
+      names: tableDefinitions.map((tableDefinition: TableDefinition) => tableDefinition.name)
+    })
+  }
+  )
+
+  if (!res.ok) {
+    return Promise.reject(new Error(`Error with the request. Status code: ${res.status}`))
+  }
+
+  return res.json()
+}
+
 async function populateTables (
   db: IDatabaseAdapter,
   usedTables: Array<string>,
@@ -81,13 +105,43 @@ async function populateTables (
   ) => usedTables.includes(tableDefinition.name))
 
   const promises = filteredTableDefinition.map(async (tableDefinition: TableDefinition) => {
+    const data = await fetchTableData(tableDefinition, headers, queryAst)
+    syncData(tableDefinition, data, db)
+  })
+  return Promise.all(promises)
+}
+
+async function populateTablesInOneHTTPRequest (
+  db: IDatabaseAdapter,
+  usedTables: Array<string>,
+  headers: any,
+  schema: any,
+  queryAst: any
+) {
+  const filteredTableDefinition = schema.filter((
+    tableDefinition: TableDefinition
+  ) => usedTables.includes(tableDefinition.name))
+  const tablesData = await fetchTablesData(filteredTableDefinition, headers, queryAst)
+  filteredTableDefinition.map((tableDefinition: TableDefinition) => {
+    populateData(
+      tableDefinition,
+      tablesData.select(tableData => tableDefinition.name === tableData.name).body,
+      db
+    )
+  })
+}
+
+function syncData(
+  tableDefinition: TableDefinition,
+  data: any,
+  db: IDatabaseAdapter
+  ) {
+    console.log(data)
     const schemas = parseSchema(tableDefinition.fields).join(', ')
 
     if (!tableDefinition.autodiscover) {
       db.createTable(tableDefinition, schemas)
     }
-
-    const data = await fetchTableData(tableDefinition, headers, queryAst)
 
     const resultKey = tableDefinition.resultKey
     const dataPointer = resultKey ? data[resultKey] : data
@@ -111,9 +165,6 @@ async function populateTables (
     } else {
       db.storeToDb(tableDefinition, fixedData)
     }
-  })
-
-  return Promise.all(promises)
 }
 
 const DEFAULT_CONFIG = {
