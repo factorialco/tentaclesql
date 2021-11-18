@@ -70,20 +70,20 @@ async function fetchTableData (
 }
 
 async function fetchTablesData (
-tableDefinitions: Array<TableDefinition>,
+  tableDefinitions: Array<TableDefinition>,
   headers: any,
   queryAst: any,
   method: 'POST' | 'GET' = 'POST'
 ): Promise<any> {
   const res = await fetch(
     process.env.BULK_FETCH_URL, {
-    headers: headers,
-    method: method,
-    body: JSON.stringify({
-      query_ast: queryAst,
-      names: tableDefinitions.map((tableDefinition: TableDefinition) => tableDefinition.name)
-    })
-  }
+      headers: headers,
+      method: method,
+      body: JSON.stringify({
+        query_ast: queryAst,
+        names: tableDefinitions.map((tableDefinition: TableDefinition) => tableDefinition.name)
+      })
+    }
   )
 
   if (!res.ok) {
@@ -122,7 +122,7 @@ async function populateTablesInOneHTTPRequest (
     tableDefinition: TableDefinition
   ) => usedTables.includes(tableDefinition.name))
   const remoteData = await fetchTablesData(filteredTableDefinition, headers, queryAst)
-  filteredTableDefinition.map((tableDefinition: TableDefinition) => {
+  filteredTableDefinition.forEach((tableDefinition: TableDefinition) => {
     const targetTable = remoteData.find(tableData => tableData.name === tableDefinition.name)
     syncData(
       tableDefinition,
@@ -132,39 +132,39 @@ async function populateTablesInOneHTTPRequest (
   })
 }
 
-function syncData(
+function syncData (
   tableDefinition: TableDefinition,
   data: any,
   db: IDatabaseAdapter
-  ) {
-    const schemas = parseSchema(tableDefinition.fields).join(', ')
+) {
+  const schemas = parseSchema(tableDefinition.fields).join(', ')
 
-    if (!tableDefinition.autodiscover) {
-      db.createTable(tableDefinition, schemas)
+  if (!tableDefinition.autodiscover) {
+    db.createTable(tableDefinition, schemas)
+  }
+
+  const resultKey = tableDefinition.resultKey
+  const dataPointer = resultKey ? data[resultKey] : data
+  const fixedData = dataPointer.map((field: any) => flattenObject(field, '_'))
+
+  if (fixedData.length === 0) return
+
+  // No support for booleans :/
+  mutateDataframe(fixedData, (row, k) => {
+    if (typeof row[k] === 'boolean') row[k] = row[k] ? 'TRUE' : 'FALSE'
+  })
+
+  if (tableDefinition.autodiscover) {
+    const dynamicDefinition = {
+      name: tableDefinition.name,
+      fields: Object.keys(fixedData[0]).map((key) => ({ key: key }))
     }
 
-    const resultKey = tableDefinition.resultKey
-    const dataPointer = resultKey ? data[resultKey] : data
-    const fixedData = dataPointer.map((field: any) => flattenObject(field, '_'))
-
-    if (fixedData.length === 0) return
-
-    // No support for booleans :/
-    mutateDataframe(fixedData, (row, k) => {
-      if (typeof row[k] === 'boolean') row[k] = row[k] ? 'TRUE' : 'FALSE'
-    })
-
-    if (tableDefinition.autodiscover) {
-      const dynamicDefinition = {
-        name: tableDefinition.name,
-        fields: Object.keys(fixedData[0]).map((key) => ({ key: key }))
-      }
-
-      db.createTable(dynamicDefinition, schemas)
-      db.storeToDb(dynamicDefinition, fixedData)
-    } else {
-      db.storeToDb(tableDefinition, fixedData)
-    }
+    db.createTable(dynamicDefinition, schemas)
+    db.storeToDb(dynamicDefinition, fixedData)
+  } else {
+    db.storeToDb(tableDefinition, fixedData)
+  }
 }
 
 const DEFAULT_CONFIG = {
@@ -172,13 +172,13 @@ const DEFAULT_CONFIG = {
   schema: []
 }
 
-async function runPopulateTables(
+async function runPopulateTables (
   db: IDatabaseAdapter,
   usedTables: Array<string>,
   headers: any,
   schema: any,
   ast: any
-  ) {
+) {
   if (process.env.BULK_FETCH) {
     await populateTablesInOneHTTPRequest(
       db,
@@ -186,7 +186,7 @@ async function runPopulateTables(
       headers,
       schema,
       ast
-      )
+    )
   } else {
     await populateTables(
       db,
@@ -197,7 +197,6 @@ async function runPopulateTables(
     )
   }
 }
-
 
 async function executor (
   sql: string,
