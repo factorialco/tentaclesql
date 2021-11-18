@@ -76,7 +76,7 @@ tableDefinitions: Array<TableDefinition>,
   method: 'POST' | 'GET' = 'POST'
 ): Promise<any> {
   const res = await fetch(
-    'https://api.ali-dev.factorialhr.com/business_intelligence/tables', {
+    process.env.BULK_FETCH_URL, {
     headers: headers,
     method: method,
     body: JSON.stringify({
@@ -121,11 +121,12 @@ async function populateTablesInOneHTTPRequest (
   const filteredTableDefinition = schema.filter((
     tableDefinition: TableDefinition
   ) => usedTables.includes(tableDefinition.name))
-  const tablesData = await fetchTablesData(filteredTableDefinition, headers, queryAst)
+  const remoteData = await fetchTablesData(filteredTableDefinition, headers, queryAst)
   filteredTableDefinition.map((tableDefinition: TableDefinition) => {
-    populateData(
+    const targetTable = remoteData.find(tableData => tableData.name === tableDefinition.name)
+    syncData(
       tableDefinition,
-      tablesData.select(tableData => tableDefinition.name === tableData.name).body,
+      targetTable.data,
       db
     )
   })
@@ -136,7 +137,6 @@ function syncData(
   data: any,
   db: IDatabaseAdapter
   ) {
-    console.log(data)
     const schemas = parseSchema(tableDefinition.fields).join(', ')
 
     if (!tableDefinition.autodiscover) {
@@ -172,6 +172,33 @@ const DEFAULT_CONFIG = {
   schema: []
 }
 
+async function runPopulateTables(
+  db: IDatabaseAdapter,
+  usedTables: Array<string>,
+  headers: any,
+  schema: any,
+  ast: any
+  ) {
+  if (process.env.BULK_FETCH) {
+    await populateTablesInOneHTTPRequest(
+      db,
+      usedTables,
+      headers,
+      schema,
+      ast
+      )
+  } else {
+    await populateTables(
+      db,
+      usedTables,
+      headers,
+      schema,
+      ast
+    )
+  }
+}
+
+
 async function executor (
   sql: string,
   parameters: Parameters,
@@ -204,7 +231,7 @@ async function executor (
     const headersWithHost = getHost() ? { ...headers, host: getHost() } : { ...headers }
     headersWithHost['user-agent'] = `tentaclesql/${version}`
 
-    await populateTables(
+    await runPopulateTables(
       db,
       usedTables,
       headers,

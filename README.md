@@ -152,3 +152,6 @@ yarn cli query "SELECT 1;"
 # or installed global
 tentaclesql query "SELECT 1;"
 ```
+
+### Bulk fetch
+`BULK_FETCH=true` and `BULK_FETCH_URL=url` to fetch all data in one HTTP request. #TODO: explain in details
