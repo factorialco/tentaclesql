@@ -154,4 +154,6 @@ tentaclesql query "SELECT 1;"
 ```
 
 ### Bulk fetch
-`BULK_FETCH=true` and `BULK_FETCH_URL=url` to fetch all data in one HTTP request. #TODO: explain in details
+By default Tentacle sends one HTTP request for each table data, however you can change this and fetch all table data in one HTTP request. To enable this you need to pass following paramaters:
+- `BULK_FETCH=true`
+- `BULK_FETCH_URL=url`

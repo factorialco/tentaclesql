@@ -75,6 +75,9 @@ async function fetchTablesData (
   queryAst: any,
   method: 'POST' | 'GET' = 'POST'
 ): Promise<any> {
+  if (process.env.BULK_FETCH_URL == undefined ) {
+    return Error(`Bulk fetch requested but bulk fetch url is not defined.`)
+  }
   const res = await fetch(
     process.env.BULK_FETCH_URL, {
       headers: headers,
@@ -123,7 +126,7 @@ async function populateTablesInOneHTTPRequest (
   ) => usedTables.includes(tableDefinition.name))
   const remoteData = await fetchTablesData(filteredTableDefinition, headers, queryAst)
   filteredTableDefinition.forEach((tableDefinition: TableDefinition) => {
-    const targetTable = remoteData.find(tableData => tableData.name === tableDefinition.name)
+    const targetTable = remoteData.find((tableData: any) => tableData.name === tableDefinition.name)
     syncData(
       tableDefinition,
       targetTable.data,
