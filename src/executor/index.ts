@@ -75,8 +75,8 @@ async function fetchTablesData (
   queryAst: any,
   method: 'POST' | 'GET' = 'POST'
 ): Promise<any> {
-  if (process.env.BULK_FETCH_URL == undefined ) {
-    return Error(`Bulk fetch requested but bulk fetch url is not defined.`)
+  if (process.env.BULK_FETCH_URL === undefined) {
+    return Error('Bulk fetch requested but bulk fetch url is not defined.')
   }
   const res = await fetch(
     process.env.BULK_FETCH_URL, {
