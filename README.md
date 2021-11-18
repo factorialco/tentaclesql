@@ -152,3 +152,8 @@ yarn cli query "SELECT 1;"
 # or installed global
 tentaclesql query "SELECT 1;"
 ```
+
+### Bulk fetch
+By default Tentacle sends one HTTP request for each table data, however you can change this and fetch all table data in one HTTP request. To enable this you need to pass following paramaters:
+- `BULK_FETCH=true`
+- `BULK_FETCH_URL=url`

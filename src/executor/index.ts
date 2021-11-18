@@ -69,6 +69,33 @@ async function fetchTableData (
   return res.json()
 }
 
+async function fetchTablesData (
+  tableDefinitions: Array<TableDefinition>,
+  headers: any,
+  queryAst: any,
+  method: 'POST' | 'GET' = 'POST'
+): Promise<any> {
+  if (process.env.BULK_FETCH_URL === undefined) {
+    return Error('Bulk fetch requested but bulk fetch url is not defined.')
+  }
+  const res = await fetch(
+    process.env.BULK_FETCH_URL, {
+      headers: headers,
+      method: method,
+      body: JSON.stringify({
+        query_ast: queryAst,
+        names: tableDefinitions.map((tableDefinition: TableDefinition) => tableDefinition.name)
+      })
+    }
+  )
+
+  if (!res.ok) {
+    return Promise.reject(new Error(`Error with the request. Status code: ${res.status}`))
+  }
+
+  return res.json()
+}
+
 async function populateTables (
   db: IDatabaseAdapter,
   usedTables: Array<string>,
@@ -81,44 +108,97 @@ async function populateTables (
   ) => usedTables.includes(tableDefinition.name))
 
   const promises = filteredTableDefinition.map(async (tableDefinition: TableDefinition) => {
-    const schemas = parseSchema(tableDefinition.fields).join(', ')
-
-    if (!tableDefinition.autodiscover) {
-      db.createTable(tableDefinition, schemas)
-    }
-
     const data = await fetchTableData(tableDefinition, headers, queryAst)
+    syncData(tableDefinition, data, db)
+  })
+  return Promise.all(promises)
+}
 
-    const resultKey = tableDefinition.resultKey
-    const dataPointer = resultKey ? data[resultKey] : data
-    const fixedData = dataPointer.map((field: any) => flattenObject(field, '_'))
+async function populateTablesInOneHTTPRequest (
+  db: IDatabaseAdapter,
+  usedTables: Array<string>,
+  headers: any,
+  schema: any,
+  queryAst: any
+) {
+  const filteredTableDefinition = schema.filter((
+    tableDefinition: TableDefinition
+  ) => usedTables.includes(tableDefinition.name))
+  const remoteData = await fetchTablesData(filteredTableDefinition, headers, queryAst)
+  filteredTableDefinition.forEach((tableDefinition: TableDefinition) => {
+    const targetTable = remoteData.find((tableData: any) => tableData.name === tableDefinition.name)
+    syncData(
+      tableDefinition,
+      targetTable.data,
+      db
+    )
+  })
+}
 
-    if (fixedData.length === 0) return
+function syncData (
+  tableDefinition: TableDefinition,
+  data: any,
+  db: IDatabaseAdapter
+) {
+  const schemas = parseSchema(tableDefinition.fields).join(', ')
 
-    // No support for booleans :/
-    mutateDataframe(fixedData, (row, k) => {
-      if (typeof row[k] === 'boolean') row[k] = row[k] ? 'TRUE' : 'FALSE'
-    })
+  if (!tableDefinition.autodiscover) {
+    db.createTable(tableDefinition, schemas)
+  }
 
-    if (tableDefinition.autodiscover) {
-      const dynamicDefinition = {
-        name: tableDefinition.name,
-        fields: Object.keys(fixedData[0]).map((key) => ({ key: key }))
-      }
+  const resultKey = tableDefinition.resultKey
+  const dataPointer = resultKey ? data[resultKey] : data
+  const fixedData = dataPointer.map((field: any) => flattenObject(field, '_'))
 
-      db.createTable(dynamicDefinition, schemas)
-      db.storeToDb(dynamicDefinition, fixedData)
-    } else {
-      db.storeToDb(tableDefinition, fixedData)
-    }
+  if (fixedData.length === 0) return
+
+  // No support for booleans :/
+  mutateDataframe(fixedData, (row, k) => {
+    if (typeof row[k] === 'boolean') row[k] = row[k] ? 'TRUE' : 'FALSE'
   })
 
-  return Promise.all(promises)
+  if (tableDefinition.autodiscover) {
+    const dynamicDefinition = {
+      name: tableDefinition.name,
+      fields: Object.keys(fixedData[0]).map((key) => ({ key: key }))
+    }
+
+    db.createTable(dynamicDefinition, schemas)
+    db.storeToDb(dynamicDefinition, fixedData)
+  } else {
+    db.storeToDb(tableDefinition, fixedData)
+  }
 }
 
 const DEFAULT_CONFIG = {
   extensions: [],
   schema: []
+}
+
+async function runPopulateTables (
+  db: IDatabaseAdapter,
+  usedTables: Array<string>,
+  headers: any,
+  schema: any,
+  ast: any
+) {
+  if (process.env.BULK_FETCH) {
+    await populateTablesInOneHTTPRequest(
+      db,
+      usedTables,
+      headers,
+      schema,
+      ast
+    )
+  } else {
+    await populateTables(
+      db,
+      usedTables,
+      headers,
+      schema,
+      ast
+    )
+  }
 }
 
 async function executor (
@@ -153,7 +233,7 @@ async function executor (
     const headersWithHost = getHost() ? { ...headers, host: getHost() } : { ...headers }
     headersWithHost['user-agent'] = `tentaclesql/${version}`
 
-    await populateTables(
+    await runPopulateTables(
       db,
       usedTables,
       headers,
