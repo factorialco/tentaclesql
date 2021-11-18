@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/factorialco/tentaclesql/compare/v1.1.0...v1.2.0) (2021-11-18)
+
+
+### Features
+
+* **server:** Adding bulk fetch to get data at once ([#20](https://github.com/factorialco/tentaclesql/issues/20)) ([f4fbbac](https://github.com/factorialco/tentaclesql/commit/f4fbbacb1fe40b321b6562674ecbf9a125557211))
+
 ## [1.1.0](https://github.com/factorialco/tentaclesql/compare/v1.0.0-beta.1...v1.1.0) (2021-11-10)
 
 
