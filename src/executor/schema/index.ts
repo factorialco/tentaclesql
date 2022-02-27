@@ -4,7 +4,7 @@ import { readFileSync } from 'fs'
 import path from 'path'
 
 type FieldDefinition = {
-  type: string,
+  type?: string,
   key: string,
 }
 
@@ -51,7 +51,7 @@ const TYPES: any = { // Perdona Pau ;)
 
 export function parseSchema (fields: Array<FieldDefinition>): Array<string> {
   return fields.map(field => {
-    const type = TYPES[field.type]
+    const type = field.type && TYPES[field.type]
 
     if (!type) return `${field.key}`
 

@@ -1,5 +1,4 @@
 import fetch from 'node-fetch'
-import { version } from '../../package.json'
 
 import { extractTables, parseSql } from './queryParser'
 import Database from './database/better-sqlite-adapter'
@@ -7,8 +6,7 @@ import IDatabaseAdapter from './database/IDatabaseAdapter'
 import flattenObject from './utils/flattenObject'
 import {
   fetchSchema,
-  parseSchema,
-  getSchemaUrl
+  parseSchema
 } from './schema'
 import logger from '../logger'
 
@@ -22,6 +20,7 @@ type FieldDefinition = {
 type TableDefinition = {
   name: string,
   url: string,
+  method?: 'POST' | 'GET',
   autodiscover?: boolean,
   resultKey?: string,
   fields: Array<FieldDefinition>
@@ -29,16 +28,6 @@ type TableDefinition = {
 
 type Schema = Array<TableDefinition>
 type Parameters = Array<any>
-
-function getHost (): string | null {
-  const schemaUrl = getSchemaUrl()
-
-  if (!schemaUrl) {
-    return null
-  }
-
-  return (new URL(schemaUrl)).hostname
-}
 
 function mutateDataframe (
   df: Array<any>,
@@ -50,17 +39,21 @@ function mutateDataframe (
 async function fetchTableData (
   tableDefinition: TableDefinition,
   headers: any,
-  queryAst: any,
-  method: 'POST' | 'GET' = 'POST'
+  queryAst: any
 ): Promise<any> {
-  const res = await fetch(tableDefinition.url, {
+
+  const config = {
     headers: headers,
-    method: method,
-    body: JSON.stringify({
+    method: tableDefinition.method
+  }
+
+  if (tableDefinition.method === 'POST') {
+    config.body = JSON.stringify({
       query_ast: queryAst
     })
   }
-  )
+
+  const res = await fetch(tableDefinition.url, config)
 
   if (!res.ok) {
     return Promise.reject(new Error(`Error with the request. Status code: ${res.status}`))
@@ -140,12 +133,6 @@ function syncData (
   data: any,
   db: IDatabaseAdapter
 ) {
-  const schemas = parseSchema(tableDefinition.fields).join(', ')
-
-  if (!tableDefinition.autodiscover) {
-    db.createTable(tableDefinition, schemas)
-  }
-
   const resultKey = tableDefinition.resultKey
   const dataPointer = resultKey ? data[resultKey] : data
   const fixedData = dataPointer.map((field: any) => flattenObject(field, '_'))
@@ -158,14 +145,19 @@ function syncData (
   })
 
   if (tableDefinition.autodiscover) {
+    const fields = Object.keys(fixedData[0]).map((key) => ({ key: key }))
     const dynamicDefinition = {
-      name: tableDefinition.name,
-      fields: Object.keys(fixedData[0]).map((key) => ({ key: key }))
+      fields,
+      name: tableDefinition.name
     }
+    const schemas = parseSchema(fields).join(', ')
 
     db.createTable(dynamicDefinition, schemas)
     db.storeToDb(dynamicDefinition, fixedData)
   } else {
+    const schemas = parseSchema(tableDefinition.fields).join(', ')
+    db.createTable(tableDefinition, schemas)
+
     db.storeToDb(tableDefinition, fixedData)
   }
 }
@@ -227,11 +219,11 @@ async function executor (
 
   if (usedTables.length > 0) {
     delete headers['content-length']
+    delete headers['host']
 
     const schema: Schema = await fetchSchema(headers, config.schema)
 
-    const headersWithHost = getHost() ? { ...headers, host: getHost() } : { ...headers }
-    headersWithHost['user-agent'] = `tentaclesql/${version}`
+    console.log(headers)
 
     await runPopulateTables(
       db,

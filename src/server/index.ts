@@ -14,7 +14,7 @@ interface Body {
 
 const build = () => {
   const server = fastify({ logger: logger })
-  server.setErrorHandler(function (error: any, request: FastifyRequest, reply: FastifyReply) {
+  server.setErrorHandler(function (error: any, _request: FastifyRequest, reply: FastifyReply) {
     this.log.error(error)
 
     if (error?.name === 'SyntaxError') {
