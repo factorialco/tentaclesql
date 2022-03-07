@@ -61,7 +61,7 @@ describe('server', () => {
       expect(response.statusCode).toBe(200)
     })
 
-    it('proper handles invalid SQL', async () => {
+    it('properly handles invalid SQL', async () => {
       const response = await app.inject({
         method: 'POST',
         url: '/',
@@ -75,6 +75,24 @@ describe('server', () => {
       })
 
       expect(response.statusCode).toBe(400)
+      expect(response.body).toBe('Syntax error found near WITH Clause (Statement)')
+    })
+
+    it('properly handles valid SQL that generates an error', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/',
+        body: {
+          query: 'SELECT foo WHERE bar;',
+          config: {
+            extensions: [],
+            schema: []
+          }
+        }
+      })
+
+      expect(response.statusCode).toBe(400)
+      expect(response.body).toBe('no such column: foo')
     })
 
     it('accepts manual schema into the same request', async () => {

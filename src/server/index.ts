@@ -12,13 +12,18 @@ interface Body {
   }
 }
 
+const FORWARDED_MESSAGES = ['SyntaxError', 'SqliteError']
+
 const build = () => {
   const server = fastify({ logger: logger })
+
   server.setErrorHandler(function (error: any, request: FastifyRequest, reply: FastifyReply) {
     this.log.error(error)
 
-    if (error?.name === 'SyntaxError') {
+    if (FORWARDED_MESSAGES.includes(error?.name)) {
       reply.code(400)
+      reply.send(error.message)
+      return
     }
 
     reply.send(error)
