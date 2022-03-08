@@ -2,7 +2,7 @@
   "name": "@factorialco/tentaclesql",
   "description": "SQL engine from multiple sources",
   "homepage": "https://github.com/factorialco/tentaclesql#readme",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "main": "dist/src/executor/index.js",
   "bin": {
     "tentaclesql": "dist/cli.js"
@@ -26,12 +26,12 @@
       "email": "sizief@gmail.com"
     },
     {
-      "name": "Omar Sotillo",
-      "email": "omar@factorial.co"
-    },
-    {
       "name": "Pau Ramon Revilla",
       "email": "masylum@gmail.com"
+    },
+    {
+      "name": "Omar Sotillo",
+      "email": "omar@factorial.co"
     }
   ],
   "repository": {
