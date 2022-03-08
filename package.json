@@ -2,7 +2,7 @@
   "name": "@factorialco/tentaclesql",
   "description": "SQL engine from multiple sources",
   "homepage": "https://github.com/factorialco/tentaclesql#readme",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "main": "dist/src/executor/index.js",
   "bin": {
     "tentaclesql": "dist/cli.js"
