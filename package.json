@@ -49,7 +49,7 @@
   "dependencies": {
     "better-sqlite3": "^7.4.3",
     "cli-table": "^0.3.6",
-    "dd-trace": "^1.5.0",
+    "dd-trace": "^2.10.0",
     "fastify": "^3.22.0",
     "node-fetch": "^2.6.2",
     "pino": "^7.0.2",
